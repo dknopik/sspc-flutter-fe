@@ -1,0 +1,180 @@
+[
+  {
+    "type": "function",
+    "name": "open",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "name": "addr_b",
+        "type": "address"
+      },
+      {
+        "name": "value_a",
+        "type": "uint256"
+      },
+      {
+        "name": "value_b",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "accept",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "cooperative_close",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "name": "value_a",
+        "type": "uint256"
+      },
+      {
+        "name": "value_b",
+        "type": "uint256"
+      },
+      {
+        "name": "sig",
+        "type": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "event",
+    "name": "Dispute",
+    "inputs": [
+      {
+        "name": "time",
+        "type": "uint64",
+        "indexed": false
+      },
+      {
+        "name": "closer",
+        "type": "address",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "HashContents",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "a",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "b",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "value_a",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "value_b",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "round",
+        "type": "uint128",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Open",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Accepted",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Closing",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "indexed": true
+      },
+      {
+        "name": "round",
+        "type": "uint128",
+        "indexed": false
+      },
+      {
+        "name": "time",
+        "type": "uint64",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Closed",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Context",
+    "inputs": [],
+    "anonymous": false
+  }
+]

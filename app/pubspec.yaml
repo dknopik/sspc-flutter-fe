@@ -47,6 +47,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   web3dart: ^2.3.5
+  rlp: ^2.0.0
+  web3dart_builders: ^0.0.7
+  build_runner: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
