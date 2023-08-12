@@ -43,10 +43,11 @@ pub fn recover(hash: u256, r: u256, s: u256, v: u8) -> address {
 }
 
 pub fn to_eth_signed_message_hash(hash: u256) -> u256 {
-    let mut buf: MemoryBuffer = MemoryBuffer::new(len: 59)
+    let mut buf: MemoryBuffer = MemoryBuffer::new(len: 60)
     let mut writer: MemoryBufferWriter = buf.writer()
     u8(0x19).write_buf(writer)
     u8(0x45).write_buf(writer)
+    u8(0x74).write_buf(writer)
     u8(0x68).write_buf(writer)
     u8(0x65).write_buf(writer)
     u8(0x72).write_buf(writer)
@@ -91,9 +92,19 @@ fn test_u256_from_array() {
 #test
 fn test_recover() {
     let hash: u256 = to_eth_signed_message_hash(hash: keccak256([u8(0x74), u8(0x65), u8(0x73), u8(0x74)]))
+    assert hash == 0x5395b52cd5641cb7ef2b18739f390fa9d02a4b2325d0f5836a18e5596ba4335e
     //assert hash == [0x58b84b4aa72f7f91bcfc42e6659976e9fbfab202fbab49cc9f99e6abd489118026151de6e6e1f61f21c5a97ab0a800b3768bd2131b667d5432ad9df3b4bcfa2f1c]
-    let addr: address = recover_from_array(hash, sig: [0x58, 0xb8, 0x4b, 0x4a, 0xa7, 0x2f, 0x7f, 0x91, 0xbc, 0xfc, 0x42, 0xe6, 0x65, 0x99, 0x76, 0xe9, 0xfb, 0xfa, 0xb2, 0x02, 0xfb, 0xab, 0x49, 0xcc, 0x9f, 0x99, 0xe6, 0xab, 0xd4, 0x89, 0x11, 0x80, 0x26, 0x15, 0x1d, 0xe6, 0xe6, 0xe1, 0xf6, 0x1f, 0x21, 0xc5, 0xa9, 0x7a, 0xb0, 0xa8, 0x00, 0xb3, 0x76, 0x8b, 0xd2, 0x13, 0x1b, 0x66, 0x7d, 0x54, 0x32, 0xad, 0x9d, 0xf3, 0xb4, 0xbc, 0xfa, 0x2f, 0x1c])
-    assert addr == 0xfbb261342ca9E146D0e241Ef45A216cF28B514Cf
+    let sig: Array<u8, 65> = [148, 136, 212, 101, 78, 96, 33, 135, 105, 56, 241, 30, 38, 33, 8, 167, 243, 24, 134, 194, 113, 227, 32, 13, 28, 186, 245, 239, 241, 200, 242, 172, 8, 206, 231, 23, 29, 119, 125, 30, 249, 29, 76, 170, 111, 146, 107, 140, 186, 38, 92, 192, 5, 34, 159, 146, 196, 124, 187, 239, 170, 190, 97, 88, 27]
+    let addr: address = recover_from_array(hash, sig)
+    assert addr == 0x2C5A28e34E4DB1eCAFc40f67cab7cbE0b71089CF
+}
+
+#test 
+fn test_inner() {
+    let inner: u256 = keccak256([u8(0x74)])
+    assert inner == 0xcac1bb71f0a97c8ac94ca9546b43178a9ad254c7b757ac07433aa6df35cd8089
+    let hash: u256 = to_eth_signed_message_hash(hash: inner)
+    assert hash == 0xb89867412c0cf1a036aad9780bfb0f8892ed0360e595a2d7c5038bbde270c615
 }
 
 #test
