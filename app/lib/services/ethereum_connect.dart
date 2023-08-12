@@ -21,7 +21,7 @@ class MyWallet {
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
-  late List<ChannelObj> channels;
+  List<ChannelObj> channels = new List.empty(growable: true);
 
   Future<void> init() async {
     // Create (or open) wallet
@@ -252,8 +252,8 @@ class ChannelObj {
         myBal: update.myBal,
         otherBal: update.otherBal,
         isProposer: otherProposer);
-    toTest.round = metadata.round +
-        BigInt.one; // implicitly makes sure that the peer only signed round + 1
+    // implicitly makes sure that the peer only signed round + 1
+    toTest.round = metadata.round + BigInt.one; 
 
     Uint8List hash = keccak256(toTest.encode());
     Uint8List pk = ecRecover(
