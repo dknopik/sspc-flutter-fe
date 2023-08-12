@@ -15,7 +15,8 @@ class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
   final MyWallet myWallet = MyWallet();
 
-  int onChainBalance = 0;
+  BigInt onChainBalance = BigInt.from(0);
+  BigInt totalBalance = BigInt.from(0);
 
   @override
   void initState() {
@@ -33,10 +34,8 @@ class _AccountScreenState extends State<AccountScreen>
     // get onchain confirmed balance
     // get balance across all channels
     print('get balance');
-    String balance = await myWallet.getOnChainBalance();
-    print(balance);
-    onChainBalance = int.tryParse(balance) ?? 0;
-    print(onChainBalance);
+    onChainBalance = await myWallet.getOnChainBalance();
+    totalBalance = await myWallet.getTotalBalance();
   }
 
   @override
@@ -190,11 +189,11 @@ class _AccountScreenState extends State<AccountScreen>
                                               text: TextSpan(
                                             children: [
                                               TextSpan(
-                                                text: '1254',
+                                                text: totalBalance.toString(),
                                                 style: Style.title,
                                               ),
                                               TextSpan(
-                                                text: '.00 wei',
+                                                text: ' wei',
                                                 style: TextStyle(
                                                   color: Color(0xFF565559),
                                                   fontSize: 20,
@@ -208,7 +207,8 @@ class _AccountScreenState extends State<AccountScreen>
                                             height: 5,
                                           ),
                                           Text(
-                                            '1102.00 wei confirmed',
+                                            onChainBalance.toString() +
+                                                ' wei confirmed',
                                             style: Style.hidden,
                                           ),
                                         ],
