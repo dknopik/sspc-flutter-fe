@@ -1,16 +1,36 @@
 import 'dart:convert';
-import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/message_provider.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:ndef/ndef.dart' as ndef;
+import 'package:provider/provider.dart';
 
 class NFCNetwork {
   Future<bool> isAvailable() async {
     var availability = await FlutterNfcKit.nfcAvailability;
     return availability == NFCAvailability.available;
   }
+
+  // void startListener(MyWallet wallet) {
+  //   for {
+  //     list = read(context)
+  //     for (elem in list) {
+  //       switch elem.type {
+  //         case 0:
+  //           channel = wallet.createNewChannel()
+  //           // trigger modal_accept_channel
+  //           // elem.toStateUpdate
+  //         case 1:
+  //           wallet.channels.first.receivedMoney(elem.asStateUpdate())
+  //         case 2:
+  //           wallet.channels.first.coopClose(elem.asSig)
+  //       }
+  //     }
+  //   }
+  // }
 
   void send(List<NetworkMessage> objects) async {
     if (!await isAvailable()) {
@@ -32,7 +52,7 @@ class NFCNetwork {
     await FlutterNfcKit.finish();
   }
 
-  Future<List<NetworkMessage>> read() async {
+  Future<List<NetworkMessage>> read(BuildContext context) async {
     if (!await isAvailable()) {
       return List.empty();
     }
@@ -50,6 +70,10 @@ class NFCNetwork {
             NetworkMessage.fromJson(jsonDecode(record.toString()));
         print(networkMessage.type);
         list.add(networkMessage);
+        Provider.of<MessageProvider>(
+          context,
+          listen: false,
+        ).addMessage(networkMessage);
       }
     }
     await FlutterNfcKit.finish();
@@ -99,15 +123,33 @@ class NetworkMessage {
 }
 
 NetworkMessage fromID(BigInt id) {
-  return NetworkMessage(type: 0, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: Uint8List(0), id: id);
+  return NetworkMessage(
+      type: 0,
+      myBal: BigInt.zero,
+      otherBal: BigInt.zero,
+      round: BigInt.zero,
+      signature: Uint8List(0),
+      id: id);
 }
 
 NetworkMessage fromStateUpdate(StateUpdate update) {
-  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: BigInt.zero);
+  return NetworkMessage(
+      type: 1,
+      myBal: update.myBal,
+      otherBal: update.otherBal,
+      round: update.round,
+      signature: update.signature,
+      id: BigInt.zero);
 }
 
 NetworkMessage fromSig(Uint8List signature) {
-  return NetworkMessage(type: 1, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: BigInt.zero);
+  return NetworkMessage(
+      type: 1,
+      myBal: BigInt.zero,
+      otherBal: BigInt.zero,
+      round: BigInt.zero,
+      signature: signature,
+      id: BigInt.zero);
 }
 
 StateUpdate asStateUpdate(NetworkMessage msg) {

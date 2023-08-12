@@ -119,6 +119,56 @@ class _NewChannelState extends State<NewChannel> {
           ),
         ],
       ),
+      Channel(
+        actions: Container(
+          width: 55,
+          child: GestureDetector(
+            child: Column(
+              children: [
+                Icon(
+                  CupertinoIcons.clear,
+                ),
+                Text('Close')
+              ],
+            ),
+            // onTap: () => showMaterialModalBottomSheet(
+            //   expand: false,
+            //   context: context,
+            //   backgroundColor: Colors.transparent,
+            //   builder: (context) => ModalClose(
+            //     channel: channel,
+            //     network: network,
+            //   ),
+            // ),
+          ),
+        ),
+        head: CircleAvatar(
+          radius: 14.0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFB2A2EA),
+                  Color(0xFF5842C2),
+                ], // Your gradient colors
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ChannelDetailScreen(
+                    channel: widget.myWallet.createNewChannel(),
+                    network: widget.nfcNetwork,
+                  )));
+        },
+        state: 'You: 2 wei | They: 13 wei',
+        title: '',
+      ),
       // Building List of view based on channels
       Expanded(
         child: ListView.builder(
@@ -126,7 +176,8 @@ class _NewChannelState extends State<NewChannel> {
           shrinkWrap: true,
           itemCount: widget.myWallet.channels.length,
           itemBuilder: (context, i) {
-            return _createChannel(widget.myWallet.channels[i], widget.nfcNetwork);
+            return _createChannel(
+                widget.myWallet.channels[i], widget.nfcNetwork);
           },
         ),
       ),
