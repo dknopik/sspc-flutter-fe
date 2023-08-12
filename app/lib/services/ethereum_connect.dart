@@ -7,6 +7,57 @@ import 'dart:typed_data';
 import 'package:web3dart/web3dart.dart';
 import 'package:rlp/rlp.dart';
 
+const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
+
+class MyWallet {
+  late Wallet wallet;
+  late Web3Client client;
+  late Channel contract;
+  late BigInt chainID;
+  String path = "wallet.json";
+  String password = "YesIHardcodeMyPasswords";
+  String rpc = "http://127.0.0.1:8545";
+  String contractAddr = "0x000";
+  late List<ChannelObj> channels;
+
+  void init() async {
+    // Create (or open) wallet
+    try {
+      String content = File("wallet.json").readAsStringSync();
+      wallet = Wallet.fromJson(content, password);
+    } catch (e) {
+      print("Wallet not found, creating new wallet.json");
+      var rng = Random.secure();
+      EthPrivateKey random = EthPrivateKey.createRandom(rng);
+      wallet = Wallet.createNew(random, "password", rng);
+      print(wallet.toJson());
+    }
+    // connect to RPC client
+    client = Web3Client(rpc, Client());
+    EthereumAddress addr = EthereumAddress.fromHex(contractAddr); 
+    chainID = await client.getChainId();
+    contract = Channel(address: addr, client: client, chainId: chainID.toInt());
+  }
+
+  ChannelObj createNewChannel() {
+    ChannelObj obj = ChannelObj(wallet: wallet, channel: contract, client: client);
+    channels.add(obj);
+    return obj;
+  }
+
+  Future<String> getOnChainBalance() async {
+    try {
+      EtherAmount balance = await client.getBalance(wallet.privateKey.address);
+      print(balance.getValueInUnit(EtherUnit.ether).toString());
+      return balance.getValueInUnit(EtherUnit.ether).toString();
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+}
+
 class MetaData {
   BigInt id;
   EthereumAddress us;
@@ -34,49 +85,31 @@ class MetaData {
   }
 }
 
-const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
+class StateUpdate {
+  BigInt myBal;
+  BigInt otherBal;
+  BigInt round;
+  Uint8List signature;
+
+  StateUpdate({
+    required this.myBal,
+    required this.otherBal,
+    required this.round,
+    required this.signature,
+  });
+}
 
 class ChannelObj {
-  late Wallet wallet;
-  late Web3Client client;
+  Wallet wallet;
+  Web3Client client;
+  Channel channel;
   late MetaData metadata;
-  late Channel channel;
-  late BigInt chainID;
-  String path = "wallet.json";
-  String password = "YesIHardcodeMyPasswords";
-  String rpc = "http://127.0.0.1:8545";
-  String contractAddr = "0x000";
 
-  void openWallet() {
-    try {
-      String content = File("wallet.json").readAsStringSync();
-      wallet = Wallet.fromJson(content, password);
-    } catch (e) {
-      print("Wallet not found, creating new wallet.json");
-      var rng = Random.secure();
-      EthPrivateKey random = EthPrivateKey.createRandom(rng);
-      wallet = Wallet.createNew(random, "password", rng);
-      print(wallet.toJson());
-    }
-  }
-
-  void connectToRPC() async {
-    client = Web3Client(rpc, Client());
-    EthereumAddress addr = EthereumAddress.fromHex(contractAddr); 
-    chainID = await client.getChainId();
-    channel = Channel(address: addr, client: client, chainId: chainID.toInt());
-  }
-
-  Future<String> getOnChainBalance() async {
-    try {
-      EtherAmount balance = await client.getBalance(wallet.privateKey.address);
-      print(balance.getValueInUnit(EtherUnit.ether).toString());
-      return balance.getValueInUnit(EtherUnit.ether).toString();
-    } catch (e) {
-      print(e);
-    }
-    return "";
-  }
+  ChannelObj({
+    required this.wallet,
+    required this.channel,
+    required this.client,
+  });
 
   bool isActive() {
     return metadata.round != BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
@@ -128,7 +161,7 @@ class ChannelObj {
     metadata.round = BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
   }
 
-  Uint8List sendMoney(BigInt value) {
+  StateUpdate sendMoney(BigInt value) {
     if (value <= BigInt.zero) {
       throw const FormatException("invalid parameter");
     }
@@ -139,20 +172,29 @@ class ChannelObj {
     BigInt newOtherBal = metadata.otherBal + value;
     metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
-    return wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+    Uint8List sig = wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+    return StateUpdate(myBal: newMyBal, otherBal: newOtherBal, round: metadata.round , signature: sig);
   }
 
-  void receivedMoney(BigInt myBal, BigInt otherBal, Uint8List sig) {
+  void receivedMoney(StateUpdate update) {
+    // Exchange myBal and otherBal in the update
+    BigInt tmp = update.myBal;
+    update.myBal = update.otherBal;
+    update.otherBal = tmp;
+
     BigInt maxBal = metadata.myBal + metadata.otherBal;
-    if (myBal + otherBal != maxBal) {
+    if (update.myBal + update.otherBal != maxBal) {
       throw const FormatException("invalid parameter, destroying or creating money");
     }
-    if (myBal < metadata.myBal) {
+    if (update.myBal < metadata.myBal) {
       throw const FormatException("invalid parameter, trying to take money");
+    }
+    if (update.round != metadata.round + BigInt.one) {
+      throw const FormatException("invalid parameter, round not consecutive");
     }
     // verify sig
     bool otherProposer = !metadata.isProposer;
-    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: myBal, otherBal: otherBal, isProposer: otherProposer);
+    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: update.myBal, otherBal: update.otherBal, isProposer: otherProposer);
     toTest.round = metadata.round + BigInt.one; // implicitly makes sure that the peer only signed round + 1
     /*
     Uint8List hash = keccak256(toTest);
@@ -160,7 +202,7 @@ class ChannelObj {
       throw const FormatException("invalid parameter, invalid signature");
     }
     */
-    _updateBalances(myBal, otherBal);
+    _updateBalances(update.myBal, update.otherBal);
   }
 
   // helper
