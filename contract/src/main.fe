@@ -1,0 +1,109 @@
+use std::evm::keccak256_mem
+
+const COOPERATIVE_CLOSE_ROUND: u128 = 0xffffffffffffffffffffffffffffffff
+const DISPUTE_PERIOD: u64 = 60 * 60 * 24
+
+// types
+pub enum Progression {
+    Nonexistant
+    Proposed
+    Accepted
+    Disputed
+    Closed
+}
+
+struct ChannelState {
+    pub a: address
+    pub b: address
+    pub value_a: u256
+    pub value_b: u256
+    pub progression: Progression
+    pub round: u128
+}
+
+struct Dispute {
+    pub time: u64
+    pub closer: address
+}
+
+struct HashContents {
+    pub id: u256
+    pub a: address
+    pub b: address
+    pub value_a: u256
+    pub value_b: u256
+    pub round: u128
+}
+
+//events
+struct Open {
+    #indexed
+    id: u256
+}
+
+struct Accepted {
+    #indexed
+    id: u256
+}
+
+struct Closing {
+    #indexed
+    id: u256
+    round: u128
+    time: u64
+}
+
+struct Closed {
+    #indexed
+    id: u256
+}
+
+fn hash_state(id: u256, state: ChannelState, value_a: u256, value_b: u256, round: u128) -> u256 {
+    return keccak256(HashContents(
+        id,
+        a: state.a,
+        b: state.b,
+        value_a,
+        value_b,
+        round,
+    ).abi_encode())
+}
+
+contract Channel {
+    channels: Map<u256, ChannelState>
+    disputes: Map<u256, Dispute>
+
+    fn other(self, id: u256, addr: address) -> address {
+        if (self.channels[id].a == addr) {
+            return self.channels[id].b
+        } else if (self.channels[id].b == addr) {
+            return self.channels[id].a
+        } else {
+            revert
+        }
+    }
+
+    fn in_progression(self, id: u256, progression: Progression) {
+        // equality between enums is unsupported??? wat
+        // assert self.channels[id].progression == progression, "channel is in invalid progression"
+    }
+
+    fn valid_state(self, id: u256, value_a: u256, value_b: u256) {
+        assert self.channels[id].value_a + self.channels[id].value_b == value_a + value_b, "value sums dont match"
+    }
+
+    pub fn open(mut self, ctx: Context, id: u256, addr_b: address, value_a: u256, value_b: u256) {
+        self.in_progression(id, progression: Progression::Nonexistant);
+        assert ctx.msg_value() == value_a, "proposer must add the correct value"
+        //TODO
+    }
+
+    pub fn accept(mut self, ctx: Context, id: u256) {
+        //TODO
+    }
+
+
+    pub fn cooperative_close(mut self, ctx: Context, id: u256, value_a: u256, value_b: u256, sig: Array<u8, 65>) {
+        //TODO
+    }
+}

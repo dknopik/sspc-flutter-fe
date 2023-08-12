@@ -1,14 +1,22 @@
 import 'package:http/http.dart';
 import 'dart:math'; //used for the random number generator
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:web3dart/web3dart.dart';
+import 'package:rlp/rlp.dart';
 
 class MetaData {
+  late BigInt id;
   late String us;
   late String other;
   late BigInt myBal;
   late BigInt otherBal;
+  late BigInt round;
+
+  Uint8List encode() {
+    return Rlp.encode([us, other, myBal, otherBal, round]);
+  }
 }
 
 class Channel {
@@ -64,15 +72,17 @@ class Channel {
 
   void coopClose() {}
 
-  void sendMoney(BigInt value) {
+  Uint8List sendMoney(BigInt value) {
+    if (value <= BigInt.zero) {
+      throw const FormatException("invalid parameter");
+    }
     BigInt newMyBal = channel.myBal - value;
     BigInt newOtherBal = channel.otherBal + value;
-    // verify update
-
     _updateMetaData(channel.other, newMyBal, newOtherBal);
+    return wallet.privateKey.signPersonalMessageToUint8List(channel.encode());
   }
 
-  void receivedMoney(BigInt myBal, BigInt otherBal) {
+  void receivedMoney(BigInt myBal, BigInt otherBal, Uint8List sig) {
     // verify sig
     _updateMetaData(channel.other, myBal, otherBal);
   }
