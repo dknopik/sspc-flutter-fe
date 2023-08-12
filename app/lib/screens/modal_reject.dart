@@ -1,3 +1,4 @@
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -7,11 +8,13 @@ import 'modal_propose.dart';
 class ModalReject extends StatelessWidget {
   final int prevA;
   final int prevB;
+  final ChannelObj channel;
 
-  const ModalReject({
+  ModalReject({
     super.key,
     required this.prevA,
     required this.prevB,
+    required this.channel,
   });
 
   @override
@@ -45,6 +48,7 @@ class ModalReject extends StatelessWidget {
                       sending: true,
                       prevA: prevA,
                       prevB: prevB,
+                      channel: channel,
                     ),
                   );
                 },
@@ -78,6 +82,7 @@ class ModalReject extends StatelessWidget {
                       sending: false,
                       prevA: prevA,
                       prevB: prevB,
+                      channel: channel,
                     ),
                   );
                 },

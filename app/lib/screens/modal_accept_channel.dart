@@ -1,7 +1,12 @@
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ModalAcceptChannel extends StatelessWidget {
+  ChannelObj channel;
+
+  ModalAcceptChannel({required this.channel});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,6 +29,9 @@ class ModalAcceptChannel extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.pop(context);
+                  // todo network service
+                  // network service get
+                  // channel.accept(id, other, myBal, otherBal);
                 },
                 child: Container(
                   alignment: Alignment.center,

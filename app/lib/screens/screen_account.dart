@@ -46,9 +46,10 @@ class _AccountScreenState extends State<AccountScreen>
       vsync: this,
     );
 
-    final List<Widget> _tabScreens = const [
+    final List<Widget> _tabScreens = [
       NewChannel(
         key: ValueKey(1),
+        myWallet: myWallet,
       ),
       HistoryChannels(
         key: ValueKey(2),

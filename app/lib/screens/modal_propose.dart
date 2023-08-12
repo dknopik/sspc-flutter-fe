@@ -1,3 +1,4 @@
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -6,12 +7,14 @@ class ModalPropose extends StatefulWidget {
   final bool sending;
   final int prevA;
   final int prevB;
+  final ChannelObj channel;
 
-  const ModalPropose({
+  ModalPropose({
     super.key,
     required this.sending,
     required this.prevA,
     required this.prevB,
+    required this.channel,
   });
 
   @override
@@ -167,6 +170,9 @@ class _ModalProposeState extends State<ModalPropose> {
               child: InkWell(
                 onTap: () {
                   Navigator.pop(context);
+                  if (widget.sending) {
+                    widget.channel.sendMoney(BigInt.from(money));
+                  }
                 },
                 child: Container(
                   alignment: Alignment.center,

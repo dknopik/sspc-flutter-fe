@@ -4,13 +4,17 @@ import 'package:app/screens/modal_channel_open.dart';
 import 'package:app/screens/modal_close.dart';
 import 'package:app/screens/modal_reject_channel.dart';
 import 'package:app/screens/screen_channel_detail_screen.dart';
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class NewChannel extends StatefulWidget {
+  final MyWallet myWallet;
+
   const NewChannel({
     super.key,
+    required this.myWallet,
   });
 
   @override
@@ -51,10 +55,80 @@ class _NewChannelState extends State<NewChannel> {
             expand: false,
             context: context,
             backgroundColor: Colors.transparent,
-            builder: (context) => ModalChannelOpen(),
+            builder: (context) => ModalChannelOpen(
+              myWallet: widget.myWallet,
+            ),
           ),
         ),
       ),
+      // Building List of view based on channels
+      Expanded(
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: widget.myWallet.channels.length,
+          itemBuilder: (context, i) {
+            return _createChannel(widget.myWallet.channels[i]);
+          },
+        ),
+      ),
+    ]));
+  }
+
+  Widget _createChannel(ChannelObj channel) {
+    EthMetaData data = channel.currentState();
+    if (channel.isActive()) {
+      return Channel(
+        actions: Container(
+          width: 55,
+          child: GestureDetector(
+            child: Column(
+              children: [
+                Icon(
+                  CupertinoIcons.clear,
+                ),
+                Text('Close')
+              ],
+            ),
+            onTap: () => showMaterialModalBottomSheet(
+              expand: false,
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => ModalClose(
+                channel: channel,
+              ),
+            ),
+          ),
+        ),
+        head: CircleAvatar(
+          radius: 14.0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFB2A2EA),
+                  Color(0xFF5842C2),
+                ], // Your gradient colors
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ChannelDetailScreen(
+                    channel: channel,
+                  )));
+        },
+        state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',
+        title: '',
+      );
+    }
+
+    if (!channel.isActive() && data.isProposer) {
       Channel(
         actions: Container(
           width: 55,
@@ -74,9 +148,12 @@ class _NewChannelState extends State<NewChannel> {
         ),
         head: Icon(CupertinoIcons.arrow_2_circlepath),
         onTap: () {},
-        state: 'You: 20 wei | They: 10 wei',
+        state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',
         title: 'Pending...',
-      ),
+      );
+    }
+
+    if (!channel.isActive() && !data.isProposer) {
       Channel(
         actions: Row(
           children: [
@@ -97,7 +174,9 @@ class _NewChannelState extends State<NewChannel> {
                     expand: false,
                     context: context,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => ModalAcceptChannel(),
+                    builder: (context) => ModalAcceptChannel(
+                      channel: channel,
+                    ),
                   );
                 },
               ),
@@ -128,54 +207,11 @@ class _NewChannelState extends State<NewChannel> {
         ),
         head: Icon(CupertinoIcons.arrow_up_arrow_down),
         onTap: () {},
-        state: 'You: 12 wei | They: 12 wei',
+        state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',
         title: 'New request',
-      ),
-      Channel(
-        actions: Container(
-          width: 55,
-          child: GestureDetector(
-            child: Column(
-              children: [
-                Icon(
-                  CupertinoIcons.clear,
-                ),
-                Text('Close')
-              ],
-            ),
-            onTap: () => showMaterialModalBottomSheet(
-              expand: false,
-              context: context,
-              backgroundColor: Colors.transparent,
-              builder: (context) => ModalClose(),
-            ),
-          ),
-        ),
-        head: CircleAvatar(
-          radius: 14.0,
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFB2A2EA),
-                  Color(0xFF5842C2),
-                ], // Your gradient colors
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-        ),
-        onTap: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => ChannelDetailScreen()));
-        },
-        state: 'You: 2 wei | They: 13 wei',
-        title: '',
-      ),
-    ]));
+      );
+    }
+    return SizedBox();
   }
 }
 

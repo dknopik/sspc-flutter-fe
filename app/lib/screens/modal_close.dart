@@ -1,7 +1,12 @@
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ModalClose extends StatelessWidget {
+  final ChannelObj channel;
+
+  ModalClose({required this.channel});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,6 +29,8 @@ class ModalClose extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.pop(context);
+                  // todo network save to netwrok
+                  Uint8List id = channel.createCoopClose();
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -34,7 +41,7 @@ class ModalClose extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Text(
-                        "propose transaction",
+                        "Terminate the Channel",
                         style: TextStyle(fontSize: 22),
                       ),
                     ),

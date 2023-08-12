@@ -1,10 +1,14 @@
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class ModalChannelOpen extends StatefulWidget {
+  final MyWallet myWallet;
+
   const ModalChannelOpen({
     super.key,
+    required this.myWallet,
   });
 
   @override
@@ -52,6 +56,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
           children: <Widget>[
             if (_isKeyboardVisible) SizedBox(height: 16),
             Column(
+              // TODO no need for A B state when openning channel?
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Initiator: '),
@@ -134,11 +139,50 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                 ),
               ],
             ),
+
+            //only as placeholder
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                Text('Opponent Address'),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 50,
+                  width: 250,
+                  child: TextField(
+                    controller: TextEditingController(),
+                    decoration: InputDecoration(
+                      floatingLabelStyle: TextStyle(color: Color(0xFF565559)),
+                      labelText: 'enter the address of opponent party',
+                      fillColor: Color(0xFF565559),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color(0xFF565559), width: 1.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      // border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: InkWell(
-                onTap: () {
+                onTap: () async {
+                  //todo Function Open Channel
                   Navigator.pop(context);
+                  ChannelObj obj = widget.myWallet.createNewChannel();
+                  String other = "0x001234";
+                  BigInt id =
+                      await obj.open(other, BigInt.from(a), BigInt.from(b));
+                  //widget.myNetwork.Send(id, )
                 },
                 child: Container(
                   alignment: Alignment.center,

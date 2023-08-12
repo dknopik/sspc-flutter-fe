@@ -14,7 +14,7 @@ class _HistoryChannelsState extends State<HistoryChannels> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
-      Text('a list of old consolidated channels'),
+      Text('a list of old consolidated channels || to be implemented'),
       // no detail screen implementation
     ]));
   }

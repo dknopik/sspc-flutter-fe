@@ -69,7 +69,7 @@ class MyWallet {
   }
 }
 
-class MetaData {
+class EthMetaData {
   BigInt id;
   EthereumAddress us;
   EthereumAddress other;
@@ -78,7 +78,7 @@ class MetaData {
   bool isProposer;
   late BigInt round;
 
-  MetaData({
+  EthMetaData({
     required this.id,
     required this.us,
     required this.other,
@@ -114,7 +114,7 @@ class ChannelObj {
   Wallet wallet;
   Web3Client client;
   Channel contract;
-  late MetaData metadata;
+  late EthMetaData metadata;
   late List<StateUpdate> history;
 
   ChannelObj({
@@ -128,11 +128,11 @@ class ChannelObj {
   }
 
   // Channel API
-  MetaData currentState() {
+  EthMetaData currentState() {
     return metadata;
   }
 
-  void open(String other, BigInt myBal, BigInt otherBal) async {
+  Future<BigInt> open(String other, BigInt myBal, BigInt otherBal) async {
     BigInt id = randomBigInt();
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
@@ -142,7 +142,7 @@ class ChannelObj {
     String res = await contract.open(id, myAddr, myBal, otherBal,
         credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
-    metadata = MetaData(
+    metadata = EthMetaData(
         id: id,
         us: myAddr,
         other: otherAddr,
@@ -155,6 +155,7 @@ class ChannelObj {
         otherBal: otherBal,
         round: BigInt.zero,
         signature: Uint8List(0)));
+    return id;
   }
 
   void accept(BigInt id, String other, BigInt myBal, BigInt otherBal) async {
@@ -166,7 +167,7 @@ class ChannelObj {
     String res = await contract.accept(id,
         credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
-    metadata = MetaData(
+    metadata = EthMetaData(
         id: id,
         us: myAddr,
         other: otherAddr,
@@ -245,7 +246,7 @@ class ChannelObj {
     }
     // verify sig
     bool otherProposer = !metadata.isProposer;
-    MetaData toTest = MetaData(
+    EthMetaData toTest = EthMetaData(
         id: metadata.id,
         us: metadata.us,
         other: metadata.other,

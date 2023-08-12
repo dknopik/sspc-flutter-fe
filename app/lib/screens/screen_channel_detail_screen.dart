@@ -2,6 +2,7 @@ import 'package:app/data/style.dart';
 import 'package:app/screens/modal_accept.dart';
 import 'package:app/screens/modal_close.dart';
 import 'package:app/screens/modal_reject.dart';
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -9,17 +10,18 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'modal_propose.dart';
 
 class ChannelDetailScreen extends StatefulWidget {
-  const ChannelDetailScreen({super.key});
+  final ChannelObj channel;
+
+  ChannelDetailScreen({
+    super.key,
+    required this.channel,
+  });
 
   @override
   State<ChannelDetailScreen> createState() => _ChannelDetailScreenState();
 }
 
 class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
-  void _incrementCounter() {
-    setState(() {});
-  }
-
   int a = 2;
   int b = 13;
 
@@ -286,10 +288,10 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         context: context,
                         backgroundColor: Colors.transparent,
                         builder: (context) => ModalPropose(
-                          sending: true,
-                          prevA: a,
-                          prevB: b,
-                        ),
+                            sending: true,
+                            prevA: a,
+                            prevB: b,
+                            channel: widget.channel),
                       ),
                     ),
                   ),
@@ -321,6 +323,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           sending: false,
                           prevA: a,
                           prevB: b,
+                          channel: widget.channel,
                         ),
                       ),
                     ),
@@ -349,7 +352,9 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         expand: false,
                         context: context,
                         backgroundColor: Colors.transparent,
-                        builder: (context) => ModalClose(),
+                        builder: (context) => ModalClose(
+                          channel: widget.channel,
+                        ),
                       ),
                     ),
                   ),
@@ -396,7 +401,9 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                           expand: false,
                                           context: context,
                                           backgroundColor: Colors.transparent,
-                                          builder: (context) => ModalAccept(),
+                                          builder: (context) => ModalAccept(
+                                            channel: widget.channel,
+                                          ),
                                         );
                                       },
                                     ),
@@ -421,6 +428,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                           builder: (context) => ModalReject(
                                             prevA: a,
                                             prevB: b,
+                                            channel: widget.channel,
                                           ),
                                         );
                                       },
