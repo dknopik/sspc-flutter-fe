@@ -5,7 +5,61 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:web3dart/web3dart.dart';
+import 'package:web3dart/crypto.dart';
+import 'package:web3dart/credentials.dart';
 import 'package:rlp/rlp.dart';
+
+const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
+const FILTER_OFFSET = 1000;
+
+class MyWallet {
+  late Wallet wallet;
+  late Web3Client client;
+  late Channel contract;
+  late BigInt chainID;
+  String path = "wallet.json";
+  String password = "YesIHardcodeMyPasswords";
+  String rpc = "http://127.0.0.1:8545";
+  String contractAddr = "0x000";
+  late List<ChannelObj> channels;
+
+  void init() async {
+    // Create (or open) wallet
+    try {
+      String content = File("wallet.json").readAsStringSync();
+      wallet = Wallet.fromJson(content, password);
+    } catch (e) {
+      print("Wallet not found, creating new wallet.json");
+      var rng = Random.secure();
+      EthPrivateKey random = EthPrivateKey.createRandom(rng);
+      wallet = Wallet.createNew(random, "password", rng);
+      print(wallet.toJson());
+    }
+    // connect to RPC client
+    client = Web3Client(rpc, Client());
+    EthereumAddress addr = EthereumAddress.fromHex(contractAddr); 
+    chainID = await client.getChainId();
+    contract = Channel(address: addr, client: client, chainId: chainID.toInt());
+  }
+
+  ChannelObj createNewChannel() {
+    ChannelObj obj = ChannelObj(wallet: wallet, contract: contract, client: client);
+    channels.add(obj);
+    return obj;
+  }
+
+  Future<String> getOnChainBalance() async {
+    try {
+      EtherAmount balance = await client.getBalance(wallet.privateKey.address);
+      print(balance.getValueInUnit(EtherUnit.ether).toString());
+      return balance.getValueInUnit(EtherUnit.ether).toString();
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+}
 
 class MetaData {
   BigInt id;
@@ -34,49 +88,32 @@ class MetaData {
   }
 }
 
-const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
+class StateUpdate {
+  BigInt myBal;
+  BigInt otherBal;
+  BigInt round;
+  Uint8List signature;
+
+  StateUpdate({
+    required this.myBal,
+    required this.otherBal,
+    required this.round,
+    required this.signature,
+  });
+}
 
 class ChannelObj {
-  late Wallet wallet;
-  late Web3Client client;
+  Wallet wallet;
+  Web3Client client;
+  Channel contract;
   late MetaData metadata;
-  late Channel channel;
-  late BigInt chainID;
-  String path = "wallet.json";
-  String password = "YesIHardcodeMyPasswords";
-  String rpc = "http://127.0.0.1:8545";
-  String contractAddr = "0x000";
+  late List<StateUpdate> history;
 
-  void openWallet() {
-    try {
-      String content = File("wallet.json").readAsStringSync();
-      wallet = Wallet.fromJson(content, password);
-    } catch (e) {
-      print("Wallet not found, creating new wallet.json");
-      var rng = Random.secure();
-      EthPrivateKey random = EthPrivateKey.createRandom(rng);
-      wallet = Wallet.createNew(random, "password", rng);
-      print(wallet.toJson());
-    }
-  }
-
-  void connectToRPC() async {
-    client = Web3Client(rpc, Client());
-    EthereumAddress addr = EthereumAddress.fromHex(contractAddr); 
-    chainID = await client.getChainId();
-    channel = Channel(address: addr, client: client, chainId: chainID.toInt());
-  }
-
-  Future<String> getOnChainBalance() async {
-    try {
-      EtherAmount balance = await client.getBalance(wallet.privateKey.address);
-      print(balance.getValueInUnit(EtherUnit.ether).toString());
-      return balance.getValueInUnit(EtherUnit.ether).toString();
-    } catch (e) {
-      print(e);
-    }
-    return "";
-  }
+  ChannelObj({
+    required this.wallet,
+    required this.contract,
+    required this.client,
+  });
 
   bool isActive() {
     return metadata.round != BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
@@ -93,9 +130,11 @@ class ChannelObj {
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await channel.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey, transaction: tx);
+    String res = await contract.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: true);
+    // Update History
+    history.add(StateUpdate(myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: Uint8List(0)));
   }
 
   void accept(BigInt id, String other, BigInt myBal, BigInt otherBal) async {
@@ -103,9 +142,11 @@ class ChannelObj {
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await channel.accept(id, credentials: wallet.privateKey, transaction: tx);
+    String res = await contract.accept(id, credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: false);
+    // Update History
+    history.add(StateUpdate(myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: Uint8List(0)));
   }
 
   Uint8List createCoopClose() {
@@ -123,12 +164,12 @@ class ChannelObj {
       valueA = metadata.otherBal;
       valueB = metadata.myBal;
     }
-    String res = await channel.cooperative_close(metadata.id, valueA, valueB, sig, credentials: wallet.privateKey);
+    String res = await contract.cooperative_close(metadata.id, valueA, valueB, sig, credentials: wallet.privateKey);
     // update metadata
     metadata.round = BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
   }
 
-  Uint8List sendMoney(BigInt value) {
+  StateUpdate sendMoney(BigInt value) {
     if (value <= BigInt.zero) {
       throw const FormatException("invalid parameter");
     }
@@ -139,32 +180,83 @@ class ChannelObj {
     BigInt newOtherBal = metadata.otherBal + value;
     metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
-    return wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+    Uint8List sig = wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+    // Update History
+    StateUpdate update = StateUpdate(myBal: newMyBal, otherBal: newOtherBal, round: metadata.round , signature: sig);
+    history.add(update);
+    return update;
   }
 
-  void receivedMoney(BigInt myBal, BigInt otherBal, Uint8List sig) {
+  void receivedMoney(StateUpdate update) {
+    // Exchange myBal and otherBal in the update
+    BigInt tmp = update.myBal;
+    update.myBal = update.otherBal;
+    update.otherBal = tmp;
+
     BigInt maxBal = metadata.myBal + metadata.otherBal;
-    if (myBal + otherBal != maxBal) {
+    if (update.myBal + update.otherBal != maxBal) {
       throw const FormatException("invalid parameter, destroying or creating money");
     }
-    if (myBal < metadata.myBal) {
+    if (update.myBal < metadata.myBal) {
       throw const FormatException("invalid parameter, trying to take money");
+    }
+    if (update.round != metadata.round + BigInt.one) {
+      throw const FormatException("invalid parameter, round not consecutive");
     }
     // verify sig
     bool otherProposer = !metadata.isProposer;
-    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: myBal, otherBal: otherBal, isProposer: otherProposer);
+    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: update.myBal, otherBal: update.otherBal, isProposer: otherProposer);
     toTest.round = metadata.round + BigInt.one; // implicitly makes sure that the peer only signed round + 1
-    /*
-    Uint8List hash = keccak256(toTest);
-    if (!isValidSignature(hash, sig, metadata.other)) {
+    
+    Uint8List hash = keccak256(toTest.encode());
+    Uint8List pk = ecRecover(hash, uint8ListToSig(update.signature)); // you can probably malleability attack this!
+    if (publicKeyToAddress(pk) != metadata.other.addressBytes) {
       throw const FormatException("invalid parameter, invalid signature");
     }
-    */
-    _updateBalances(myBal, otherBal);
+    // Update state
+    history.add(update);
+    _updateBalances(update.myBal, update.otherBal);
+  }
+
+  // Event filtering
+
+  Future<Stream<Open>> waitForOpenEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.openEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Accepted>> waitForAcceptedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.acceptedEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Closing>> waitForClosingEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.closingEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Closed>> waitForClosedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.closedEvents(fromBlock: from, toBlock: BlockNum.current());
   }
 
   // helper
-
   void _updateBalances(BigInt myBal, BigInt otherBal) {
     metadata.myBal = myBal;
     metadata.otherBal = otherBal;
@@ -178,6 +270,22 @@ BigInt randomBigInt() {
   BigInt result = BigInt.zero;
   for (var i = 0; i < size; i++) {
     result |= BigInt.from(random.nextInt(256)) << (8 * i);
+  }
+  return result;
+}
+
+MsgSignature uint8ListToSig(Uint8List list) {
+  BigInt r = bytesToBigInt(list.sublist(0, 32));
+  BigInt s = bytesToBigInt(list.sublist(32, 64));
+  int v = list.elementAt(64);
+  return MsgSignature(r, s, v);
+}
+
+/// Converts a [Uint8List] byte buffer into a [BigInt]
+BigInt bytesToBigInt(Uint8List bytes) {
+  BigInt result = BigInt.zero;
+  for (final byte in bytes) {
+    result =  BigInt.from(byte) | (result << 8);
   }
   return result;
 }
