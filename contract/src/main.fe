@@ -1,4 +1,5 @@
-use std::evm::keccak256_mem
+use std::precompiles::ec_recover
+use safe_recover::recover_from_array
 
 const COOPERATIVE_CLOSE_ROUND: u128 = 0xffffffffffffffffffffffffffffffff
 const DISPUTE_PERIOD: u64 = 60 * 60 * 24
@@ -38,50 +39,50 @@ struct HashContents {
 //events
 struct Open {
     #indexed
-    id: u256
+    pub id: u256
 }
 
 struct Accepted {
     #indexed
-    id: u256
+    pub id: u256
 }
 
 struct Closing {
     #indexed
-    id: u256
-    round: u128
-    time: u64
+    pub id: u256
+    pub round: u128
+    pub time: u64
 }
 
 struct Closed {
     #indexed
-    id: u256
+    pub id: u256
 }
 
-fn hash_state(id: u256, state: ChannelState, value_a: u256, value_b: u256, round: u128) -> u256 {
+fn hash_state(id: u256, channel: ChannelState, value_a: u256, value_b: u256, round: u128) -> u256 {
     return keccak256(HashContents(
         id,
-        a: state.a,
-        b: state.b,
+        a: channel.a,
+        b: channel.b,
         value_a,
         value_b,
         round,
     ).abi_encode())
 }
 
+fn other(channel: ChannelState, addr: address) -> address {
+    if (channel.a == addr) {
+        return channel.b
+    } else if (channel.b == addr) {
+        return channel.a
+    } else {
+        revert
+    }
+}
+
 contract Channel {
     channels: Map<u256, ChannelState>
     disputes: Map<u256, Dispute>
-
-    fn other(self, id: u256, addr: address) -> address {
-        if (self.channels[id].a == addr) {
-            return self.channels[id].b
-        } else if (self.channels[id].b == addr) {
-            return self.channels[id].a
-        } else {
-            revert
-        }
-    }
 
     fn in_progression(self, id: u256, progression: Progression) {
         // equality between enums is unsupported??? wat
@@ -92,18 +93,55 @@ contract Channel {
         assert self.channels[id].value_a + self.channels[id].value_b == value_a + value_b, "value sums dont match"
     }
 
-    pub fn open(mut self, ctx: Context, id: u256, addr_b: address, value_a: u256, value_b: u256) {
-        self.in_progression(id, progression: Progression::Nonexistant);
+    pub fn open(mut self, mut ctx: Context, id: u256, addr_b: address, value_a: u256, value_b: u256) {
+        let mut channel: ChannelState = self.channels[id].to_mem()
+        match channel.progression {
+            Progression::Nonexistant => {}
+            _ => {
+                revert
+            }
+        }
         assert ctx.msg_value() == value_a, "proposer must add the correct value"
-        //TODO
+        channel.a = ctx.msg_sender()
+        channel.b = addr_b
+        channel.value_a = value_a
+        channel.value_b = value_b
+        channel.progression = Progression::Proposed
+        self.channels[id] = channel
+        ctx.emit(Open(id))
     }
 
-    pub fn accept(mut self, ctx: Context, id: u256) {
-        //TODO
+    pub fn accept(mut self, mut ctx: Context, id: u256) {
+        let mut channel: ChannelState = self.channels[id].to_mem();
+        match channel.progression {
+            Progression::Proposed => {}
+            _ => {
+                revert
+            }
+        }
+        assert ctx.msg_value() == channel.value_b, "acceptooor must add the correct value"
+        self.channels[id].progression = Progression::Accepted
+        ctx.emit(Accepted(id))
     }
 
+    pub fn cooperative_close(mut self, mut ctx: Context, id: u256, value_a: u256, value_b: u256, sig: Array<u8, 65>) {
+        let mut channel: ChannelState = self.channels[id].to_mem();
+        match self.channels[id].progression {
+            Progression::Accepted => {}
+            _ => {
+                revert
+            }
+        }
+        let hash: u256 = hash_state(id, channel, value_a, value_b, round: COOPERATIVE_CLOSE_ROUND)
+        let addr: address = other(channel, addr: ctx.msg_sender())
+        assert recover_from_array(hash, sig) == addr, "invalid signature"
+        self.payout(ctx, id, value_a, value_b)
+        ctx.emit(Closed(id))
+    }
 
-    pub fn cooperative_close(mut self, ctx: Context, id: u256, value_a: u256, value_b: u256, sig: Array<u8, 65>) {
-        //TODO
+    fn payout(mut self, mut ctx: Context, id: u256, value_a: u256, value_b: u256) {
+        self.channels[id].progression = Progression::Closed
+        ctx.send_value(to: self.channels[id].a, wei: value_a)
+        ctx.send_value(to: self.channels[id].b, wei: value_b)
     }
 }

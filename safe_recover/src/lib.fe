@@ -1,0 +1,49 @@
+use std::evm
+use std::buf::MemoryBuffer
+use std::buf::MemoryBufferReader
+use std::precompiles::ec_recover
+
+fn u256_from_array(sig: Array<u8, 65>, offset: u256) -> u256 {
+    let mut i: u256 = 0;
+    let mut result: u256 = 0;
+    while i < 32 {
+        result += evm::shl(bits: 248 - (i * 8), value: sig[i + offset])
+        i += 1
+    }
+    return result
+}
+
+pub fn recover_from_array(hash: u256, sig: Array<u8, 65>) -> address {
+    let r: u256 = u256_from_array(sig, offset: 0)
+    let s: u256 = u256_from_array(sig, offset: 32)
+    let v: u8 = sig[64]
+    return recover(hash, r, s, v)
+}
+
+pub fn recover_from_buffer(hash: u256, sig: MemoryBuffer) -> address {
+    let mut sig_reader: MemoryBufferReader = MemoryBufferReader::new(buf: sig)
+    let r: u256 = sig_reader.read_u256()
+    let s: u256 = sig_reader.read_u256()
+    let v: u8 = sig_reader.read_u8()
+    return recover(hash, r, s, v)
+}
+
+pub fn recover(hash: u256, r: u256, s: u256, v: u8) -> address {
+    if s > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0 {
+        return 0
+    }
+
+    if v != 27 and v != 28 {
+        return 0
+    }
+
+    return ec_recover(hash, v, r, s)
+}
+
+#test
+fn test_u256_from_array() {
+    //let test_array: Array<u8, 32> = [128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    //let number: u256 = u256_from_array(sig: test_array, offset: 0)
+    //assert number == 0x8000000000000000000000000000000000000000000000000000000000000001
+}
+
