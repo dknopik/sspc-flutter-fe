@@ -92,7 +92,8 @@ class ChannelObj {
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
-    String res = await channel.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey);
+    Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
+    String res = await channel.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: true);
   }
@@ -101,7 +102,8 @@ class ChannelObj {
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
-    String res = await channel.accept(id, credentials: wallet.privateKey);
+    Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
+    String res = await channel.accept(id, credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: false);
   }
