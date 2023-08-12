@@ -1,12 +1,56 @@
 import 'dart:convert';
-import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:app/services/ethereum_connect.dart';
+import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:app/screens/modal_accept_channel.dart';
 import 'package:ndef/ndef.dart' as ndef;
 
 class NFCNetwork {
+
+  void startListener(BuildContext context, MyWallet wallet) async {
+    while(true) {
+      List<NetworkMessage> messages = await read();
+      for (final msg in messages) {
+        switch (msg.type) {
+          case 0: // Channel announcement
+            ChannelObj channel = wallet.createNewChannel();
+            // trigger modal
+            showMaterialModalBottomSheet(
+              expand: false,
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => ModalAcceptChannel(
+                channel: channel,
+                id: msg.id,
+                myBal: msg.otherBal, // turn around myBal and otherBal here
+                otherBal: msg.myBal,
+                other: msg.signature,
+              ),
+            );
+            break;
+          case 1: // Channel update
+            BigInt id = msg.id;
+            wallet.channels.forEach(
+              (element) 
+              {if (element.metadata.id == id) {
+                element.receivedMoney(asStateUpdate(msg));
+              }});
+            break;
+          case 2: // Channel closing
+            BigInt id = msg.id;
+            wallet.channels.forEach(
+              (element) 
+              {if (element.metadata.id == id) {
+                element.coopClose(asSignature(msg));
+              }});
+        }
+      }
+    }
+  }
+
   Future<bool> isAvailable() async {
     var availability = await FlutterNfcKit.nfcAvailability;
     return availability == NFCAvailability.available;
@@ -98,25 +142,27 @@ class NetworkMessage {
   }
 }
 
-NetworkMessage fromID(BigInt id) {
-  return NetworkMessage(type: 0, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: Uint8List(0), id: id);
+NetworkMessage fromProposal(BigInt id, BigInt myBal, BigInt otherBal, Uint8List address) {
+  return NetworkMessage(type: 0, myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: address, id: id);
 }
 
 NetworkMessage fromStateUpdate(StateUpdate update) {
-  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: BigInt.zero);
+  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: update.id);
 }
 
 NetworkMessage fromSig(Uint8List signature) {
-  return NetworkMessage(type: 1, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: BigInt.zero);
+  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: BigInt.zero);
 }
 
 StateUpdate asStateUpdate(NetworkMessage msg) {
-  if (msg.type == 1) {
-    return StateUpdate(
-        myBal: msg.myBal,
-        otherBal: msg.otherBal,
-        round: msg.round,
-        signature: msg.signature);
-  }
-  throw const FormatException("invalid parameter");
+  return StateUpdate(
+    id: msg.id,
+    myBal: msg.myBal,
+    otherBal: msg.otherBal,
+    round: msg.round,
+    signature: msg.signature);
+}
+
+Uint8List asSignature(NetworkMessage msg) {
+  return msg.signature;
 }

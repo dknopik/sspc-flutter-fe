@@ -41,7 +41,7 @@ class MyWallet {
     // connect to RPC client
     client = Web3Client(rpc, Client());
     EthereumAddress addr = EthereumAddress.fromHex(contractAddr);
-    print(addr);
+    print(wallet.privateKey.address);
     chainID = await client.getChainId();
     contract = Channel(address: addr, client: client, chainId: chainID.toInt());
   }
@@ -70,6 +70,10 @@ class MyWallet {
       print(e);
     }
     return BigInt.zero;
+  }
+
+  Uint8List address() {
+    return wallet.privateKey.address.addressBytes;
   }
 }
 
@@ -101,12 +105,14 @@ class EthMetaData {
 }
 
 class StateUpdate {
+  BigInt id;
   BigInt myBal;
   BigInt otherBal;
   BigInt round;
   Uint8List signature;
 
   StateUpdate({
+    required this.id,
     required this.myBal,
     required this.otherBal,
     required this.round,
@@ -155,6 +161,7 @@ class ChannelObj {
         isProposer: true);
     // Update History
     history.add(StateUpdate(
+        id: id,
         myBal: myBal,
         otherBal: otherBal,
         round: BigInt.zero,
@@ -180,6 +187,7 @@ class ChannelObj {
         isProposer: false);
     // Update History
     history.add(StateUpdate(
+        id: id,
         myBal: myBal,
         otherBal: otherBal,
         round: BigInt.zero,
@@ -223,6 +231,7 @@ class ChannelObj {
         wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
     // Update History
     StateUpdate update = StateUpdate(
+        id: metadata.id,
         myBal: newMyBal,
         otherBal: newOtherBal,
         round: metadata.round,

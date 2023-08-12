@@ -214,7 +214,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   String other = "0x001234";
                   BigInt id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
-                  widget.network.send(List.from([fromID(id)]));
+                  widget.network.send(List.from([fromProposal(id, BigInt.from(a), BigInt.from(b), widget.myWallet.address())]));
                 },
                 child: Container(
                   alignment: Alignment.center,

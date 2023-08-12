@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ModalAcceptChannel extends StatelessWidget {
-  ChannelObj channel;
+  final ChannelObj channel;
+  final BigInt id;
+  final BigInt otherBal;
+  final BigInt myBal;
+  final Uint8List other;
 
-  ModalAcceptChannel({required this.channel});
+  ModalAcceptChannel({required this.channel, required this.id, required this.otherBal, required this.myBal, required this.other});
 
   @override
   Widget build(BuildContext context) {

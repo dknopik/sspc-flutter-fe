@@ -229,15 +229,15 @@ class _NewChannelState extends State<NewChannel> {
                   ],
                 ),
                 onTap: () {
-                  //call function to sign
-                  showMaterialModalBottomSheet(
-                    expand: false,
-                    context: context,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => ModalAcceptChannel(
-                      channel: channel,
-                    ),
-                  );
+                  // //call function to sign
+                  // showMaterialModalBottomSheet(
+                  //   expand: false,
+                  //   context: context,
+                  //   backgroundColor: Colors.transparent,
+                  //   builder: (context) => ModalAcceptChannel(
+                  //     channel: channel,
+                  //   ),
+                  // );
                 },
               ),
             ),
