@@ -63,7 +63,7 @@ class NetworkMessage {
   BigInt otherBal;
   BigInt round;
   Uint8List signature;
-  String id;
+  BigInt id;
 
   NetworkMessage({
     required this.type,
@@ -81,7 +81,7 @@ class NetworkMessage {
       "otherBal": otherBal.toString(),
       "round": round.toString(),
       "signature": signature,
-      "id": id,
+      "id": id.toString(),
     };
   }
 
@@ -92,50 +92,18 @@ class NetworkMessage {
       otherBal: BigInt.parse(json["otherBal"]),
       round: BigInt.parse(json["round"]),
       signature: json["signature"],
-      id: json["id"] ?? "",
+      id: BigInt.parse(json["id"]),
     );
     return networkMessage;
   }
-//   fromString(String s) {
-//     List<String> subMsg = s.split("\n");
-//     type = int.parse(subMsg.first);
-//     message = s.substring(subMsg.first.length);
-//   }
 }
 
-// NetworkMessage IDasNM(BigInt id) {
-//   return NetworkMessage(type: 0, message: id.toString());
-// }
+NetworkMessage fromID(BigInt id) {
+  return NetworkMessage(type: 0, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: Uint8List(0), id: id);
+}
 
-// BigInt AsId(NetworkMessage msg) {
-//   if (msg.type == 0) {
-//     return BigInt.parse(msg.message);
-//   }
-//   throw const FormatException("invalid parameter");
-// }
-
-// NetworkMessage StateUpdateasNM(StateUpdate update) {
-//   String message = "";
-//   message += update.myBal.toString();
-//   message += "\n";
-//   message += update.otherBal.toString();
-//   message += "\n";
-//   message += update.round.toString();
-//   message += "\n";
-//   message += update.signature.toHexString();
-//   return NetworkMessage(type: 1, message: message);
-// }
-
-StateUpdate NMasStateUpdate(NetworkMessage msg) {
+StateUpdate asStateUpdate(NetworkMessage msg) {
   if (msg.type == 1) {
-    // List<String> subMsg = msg.message.split("\n");
-    // if (subMsg.length != 4) {
-    //   throw const FormatException("invalid parameter");
-    // }
-    // BigInt myBal = BigInt.parse(subMsg.elementAt(0));
-    // BigInt otherBal = BigInt.parse(subMsg.elementAt(1));
-    // BigInt round = BigInt.parse(subMsg.elementAt(2));
-    // Uint8List signature = hexToUint8List(subMsg.elementAt(3));
     return StateUpdate(
         myBal: msg.myBal,
         otherBal: msg.otherBal,
