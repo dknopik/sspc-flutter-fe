@@ -38,6 +38,8 @@ class _AccountScreenState extends State<AccountScreen>
     print('get balance');
     onChainBalance = await myWallet.getOnChainBalance();
     totalBalance = await myWallet.getTotalBalance();
+    print('started listener');
+    network.startListener(context, myWallet);
   }
 
   @override

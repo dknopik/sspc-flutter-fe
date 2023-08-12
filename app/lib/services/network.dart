@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:app/services/ethereum_connect.dart';
@@ -48,6 +49,7 @@ class NFCNetwork {
               }});
         }
       }
+      sleep(Duration(seconds: 1));
     }
   }
 
