@@ -2,4 +2,4 @@ name = "sspc"
 version = "1.0"
 
 [dependencies]
-safe_recover = "../safe_recover"
+ecdsa = "../ecdsa"
