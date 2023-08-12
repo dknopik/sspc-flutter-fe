@@ -37,13 +37,14 @@ class MyWallet {
     }
     // connect to RPC client
     client = Web3Client(rpc, Client());
-    EthereumAddress addr = EthereumAddress.fromHex(contractAddr); 
+    EthereumAddress addr = EthereumAddress.fromHex(contractAddr);
     chainID = await client.getChainId();
     contract = Channel(address: addr, client: client, chainId: chainID.toInt());
   }
 
   ChannelObj createNewChannel() {
-    ChannelObj obj = ChannelObj(wallet: wallet, contract: contract, client: client);
+    ChannelObj obj =
+        ChannelObj(wallet: wallet, contract: contract, client: client);
     channels.add(obj);
     return obj;
   }
@@ -58,7 +59,6 @@ class MyWallet {
     }
     return "";
   }
-
 }
 
 class MetaData {
@@ -129,24 +129,48 @@ class ChannelObj {
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
-    Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await contract.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey, transaction: tx);
+    Transaction tx =
+        Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
+    String res = await contract.open(id, myAddr, myBal, otherBal,
+        credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
-    metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: true);
+    metadata = MetaData(
+        id: id,
+        us: myAddr,
+        other: otherAddr,
+        myBal: myBal,
+        otherBal: otherBal,
+        isProposer: true);
     // Update History
-    history.add(StateUpdate(myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: Uint8List(0)));
+    history.add(StateUpdate(
+        myBal: myBal,
+        otherBal: otherBal,
+        round: BigInt.zero,
+        signature: Uint8List(0)));
   }
 
   void accept(BigInt id, String other, BigInt myBal, BigInt otherBal) async {
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
-    Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await contract.accept(id, credentials: wallet.privateKey, transaction: tx);
+    Transaction tx =
+        Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
+    String res = await contract.accept(id,
+        credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
-    metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: false);
+    metadata = MetaData(
+        id: id,
+        us: myAddr,
+        other: otherAddr,
+        myBal: myBal,
+        otherBal: otherBal,
+        isProposer: false);
     // Update History
-    history.add(StateUpdate(myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: Uint8List(0)));
+    history.add(StateUpdate(
+        myBal: myBal,
+        otherBal: otherBal,
+        round: BigInt.zero,
+        signature: Uint8List(0)));
   }
 
   Uint8List createCoopClose() {
@@ -164,7 +188,9 @@ class ChannelObj {
       valueA = metadata.otherBal;
       valueB = metadata.myBal;
     }
-    String res = await contract.cooperative_close(metadata.id, valueA, valueB, sig, credentials: wallet.privateKey);
+    String res = await contract.cooperative_close(
+        metadata.id, valueA, valueB, sig,
+        credentials: wallet.privateKey);
     // update metadata
     metadata.round = BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
   }
@@ -180,9 +206,14 @@ class ChannelObj {
     BigInt newOtherBal = metadata.otherBal + value;
     metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
-    Uint8List sig = wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+    Uint8List sig =
+        wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
     // Update History
-    StateUpdate update = StateUpdate(myBal: newMyBal, otherBal: newOtherBal, round: metadata.round , signature: sig);
+    StateUpdate update = StateUpdate(
+        myBal: newMyBal,
+        otherBal: newOtherBal,
+        round: metadata.round,
+        signature: sig);
     history.add(update);
     return update;
   }
@@ -195,7 +226,8 @@ class ChannelObj {
 
     BigInt maxBal = metadata.myBal + metadata.otherBal;
     if (update.myBal + update.otherBal != maxBal) {
-      throw const FormatException("invalid parameter, destroying or creating money");
+      throw const FormatException(
+          "invalid parameter, destroying or creating money");
     }
     if (update.myBal < metadata.myBal) {
       throw const FormatException("invalid parameter, trying to take money");
@@ -205,11 +237,21 @@ class ChannelObj {
     }
     // verify sig
     bool otherProposer = !metadata.isProposer;
-    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: update.myBal, otherBal: update.otherBal, isProposer: otherProposer);
-    toTest.round = metadata.round + BigInt.one; // implicitly makes sure that the peer only signed round + 1
-    
+    MetaData toTest = MetaData(
+        id: metadata.id,
+        us: metadata.us,
+        other: metadata.other,
+        myBal: update.myBal,
+        otherBal: update.otherBal,
+        isProposer: otherProposer);
+    toTest.round = metadata.round +
+        BigInt.one; // implicitly makes sure that the peer only signed round + 1
+
     Uint8List hash = keccak256(toTest.encode());
-    Uint8List pk = ecRecover(hash, uint8ListToSig(update.signature)); // you can probably malleability attack this!
+    Uint8List pk = ecRecover(
+        hash,
+        uint8ListToSig(
+            update.signature)); // you can probably malleability attack this!
     if (publicKeyToAddress(pk) != metadata.other.addressBytes) {
       throw const FormatException("invalid parameter, invalid signature");
     }
@@ -235,7 +277,8 @@ class ChannelObj {
       throw const FormatException("current block too low");
     }
     BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
-    return contract.acceptedEvents(fromBlock: from, toBlock: BlockNum.current());
+    return contract.acceptedEvents(
+        fromBlock: from, toBlock: BlockNum.current());
   }
 
   Future<Stream<Closing>> waitForClosingEvent() async {
@@ -263,7 +306,6 @@ class ChannelObj {
   }
 }
 
-
 BigInt randomBigInt() {
   const size = 256;
   final random = Random.secure();
@@ -285,7 +327,7 @@ MsgSignature uint8ListToSig(Uint8List list) {
 BigInt bytesToBigInt(Uint8List bytes) {
   BigInt result = BigInt.zero;
   for (final byte in bytes) {
-    result =  BigInt.from(byte) | (result << 8);
+    result = BigInt.from(byte) | (result << 8);
   }
   return result;
 }

@@ -2,6 +2,7 @@ import 'package:app/components/default_sliver_app_bar_title.dart';
 import 'package:app/data/style.dart';
 import 'package:app/screens/screen_history_channels.dart';
 import 'package:app/screens/screen_new_channel.dart';
+import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,18 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
+  final MyWallet myWallet = MyWallet();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("init");
+    myWallet.init();
+    // get onchain confirmed balance
+    // get balance across all channels
+  }
+
   @override
   Widget build(BuildContext context) {
     final ScrollController _scrollController = ScrollController();
