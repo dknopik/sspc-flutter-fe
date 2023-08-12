@@ -12,8 +12,8 @@ class ModalChannelOpen extends StatefulWidget {
 }
 
 class _ModalChannelOpenState extends State<ModalChannelOpen> {
-  double a = 0;
-  double b = 0;
+  int a = 0;
+  int b = 0;
   final _controllerA = TextEditingController();
   final _controllerB = TextEditingController();
   bool _isKeyboardVisible = false;
@@ -42,68 +42,93 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
+        padding: EdgeInsets.all(20),
         decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
                 topRight: Radius.circular(20), topLeft: Radius.circular(20))),
         child: Wrap(
+          alignment: WrapAlignment.center,
           children: <Widget>[
             if (_isKeyboardVisible) SizedBox(height: 16),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('A: '),
+                Text('Initiator: '),
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
-                  height: 100,
-                  width: 300,
+                  height: 50,
+                  width: 130,
                   child: TextField(
                     onChanged: (str) {
                       setState(() {
-                        a = double.tryParse(_controllerA.text) ?? 0.0;
+                        a = int.tryParse(_controllerA.text) ?? 0;
                       });
                     },
                     controller: _controllerA,
                     keyboardType: TextInputType.numberWithOptions(
-                      decimal: true,
+                      decimal: false,
                       signed: true,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Enter a Double Number',
-                      border: OutlineInputBorder(),
+                      labelText: 'initial eth',
+                      // border: OutlineInputBorder(),
+                      fillColor: Color(0xFF565559),
+                      floatingLabelStyle: TextStyle(color: Color(0xFF565559)),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color(0xFF565559), width: 1.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                     ),
 
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d*\.?\d{0,2}$')),
+                      FilteringTextInputFormatter.digitsOnly
                     ], // Only numbers can be entered
                   ),
                 ),
               ],
             ),
-            Row(
+            SizedBox(
+              width: 40,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('B: '),
+                Text('Responder: '),
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
-                  height: 100,
-                  width: 300,
+                  height: 50,
+                  width: 130,
                   child: TextField(
                     onChanged: (str) {
                       setState(() {
-                        b = double.tryParse(_controllerB.text) ?? 0.0;
+                        b = int.tryParse(_controllerB.text) ?? 0;
                       });
                     },
                     controller: _controllerB,
                     keyboardType: TextInputType.numberWithOptions(
-                      decimal: true,
+                      decimal: false,
                       signed: true,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Enter a Double Number',
-                      border: OutlineInputBorder(),
+                      floatingLabelStyle: TextStyle(color: Color(0xFF565559)),
+                      labelText: 'initial eth',
+                      fillColor: Color(0xFF565559),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color(0xFF565559), width: 1.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      // border: OutlineInputBorder(),
                     ),
 
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d*\.?\d{0,2}$')),
+                      FilteringTextInputFormatter.digitsOnly
                     ], // Only numbers can be entered
                   ),
                 ),
@@ -118,14 +143,19 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                 child: Container(
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                      color: Color(0x60282e),
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [],
+                    border: Border.all(
+                      color: Color(0xFF565559),
+                    ),
+                  ),
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Text(
-                        "propose transaction",
-                        style: TextStyle(fontSize: 22),
+                        "Propose transaction",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ),

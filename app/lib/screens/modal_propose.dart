@@ -4,8 +4,8 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class ModalPropose extends StatefulWidget {
   final bool sending;
-  final double prevA;
-  final double prevB;
+  final int prevA;
+  final int prevB;
 
   const ModalPropose({
     super.key,
@@ -19,7 +19,7 @@ class ModalPropose extends StatefulWidget {
 }
 
 class _ModalProposeState extends State<ModalPropose> {
-  double money = 10.00;
+  int money = 10;
   final _controller = TextEditingController();
   bool _isKeyboardVisible = false;
 
@@ -56,6 +56,7 @@ class _ModalProposeState extends State<ModalPropose> {
             if (_isKeyboardVisible) SizedBox(height: 16),
             const Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(8.0),
@@ -105,33 +106,26 @@ class _ModalProposeState extends State<ModalPropose> {
                 SizedBox(
                   width: 10,
                 ),
-                Text(
-                  "$money",
-                  style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
-                ),
                 Container(
                   width: 100,
                   height: 100,
                   child: TextField(
                     onChanged: (str) {
                       setState(() {
-                        money = double.tryParse(_controller.text) ?? 0.0;
+                        money = int.tryParse(_controller.text) ?? 0;
                       });
                     },
                     controller: _controller,
                     keyboardType: TextInputType.numberWithOptions(
-                      decimal: true,
+                      decimal: false,
                       signed: true,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Enter a Double Number',
                       border: OutlineInputBorder(),
                     ),
-
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d*\.?\d{0,2}$')),
-                    ], // Only numbers can be entered
+                      FilteringTextInputFormatter.digitsOnly
+                    ], //// Only numbers can be entered
                   ),
                 ),
                 SizedBox(
@@ -184,6 +178,29 @@ class _ModalProposeState extends State<ModalPropose> {
                       padding: const EdgeInsets.all(12),
                       child: Text(
                         "propose transaction",
+                        style: TextStyle(fontSize: 22),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: Color(0x60282e),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        "cancel",
                         style: TextStyle(fontSize: 22),
                       ),
                     ),

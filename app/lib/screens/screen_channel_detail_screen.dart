@@ -20,8 +20,8 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
     setState(() {});
   }
 
-  double a = 2;
-  double b = 13;
+  int a = 2;
+  int b = 13;
 
   List<ChannelTransaction> testData = [
     ChannelTransaction(
@@ -504,10 +504,10 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 }
 
 class ChannelTransaction {
-  double prevA;
-  double prevB;
-  double newA;
-  double newB;
+  int prevA;
+  int prevB;
+  int newA;
+  int newB;
   bool sending;
   bool signedByA; //proposal
   bool signedByB; //confirmation

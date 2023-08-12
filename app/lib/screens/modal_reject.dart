@@ -5,8 +5,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'modal_propose.dart';
 
 class ModalReject extends StatelessWidget {
-  final double prevA;
-  final double prevB;
+  final int prevA;
+  final int prevB;
 
   const ModalReject({
     super.key,
