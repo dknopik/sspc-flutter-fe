@@ -26,40 +26,114 @@ class _NewChannelState extends State<NewChannel> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
-      Container(
-        margin: const EdgeInsets.all(20.0),
-        width: 180,
-        height: 100,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Style.background,
-        ),
-        alignment: Alignment.center,
-        child: GestureDetector(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                CupertinoIcons.plus_circled,
+      Row(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            width: 180,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Style.background,
+            ),
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.plus_circled,
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    child: Text(
+                      'Open Channel',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
               ),
-              SizedBox(height: 10),
-              SizedBox(
-                child: Text(
-                  'Open Channel',
-                  textAlign: TextAlign.center,
+              onTap: () => showMaterialModalBottomSheet(
+                expand: false,
+                context: context,
+                backgroundColor: Colors.transparent,
+                builder: (context) => ModalChannelOpen(
+                  myWallet: widget.myWallet,
                 ),
-              )
-            ],
-          ),
-          onTap: () => showMaterialModalBottomSheet(
-            expand: false,
-            context: context,
-            backgroundColor: Colors.transparent,
-            builder: (context) => ModalChannelOpen(
-              myWallet: widget.myWallet,
+              ),
             ),
           ),
-        ),
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            width: 180,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Style.background,
+            ),
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.plus_circled,
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    child: Text(
+                      'Generate QR Code',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+              onTap: () => showMaterialModalBottomSheet(
+                expand: false,
+                context: context,
+                backgroundColor: Colors.transparent,
+                builder: (context) => ModalChannelOpen(
+                  myWallet: widget.myWallet,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            width: 180,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Style.background,
+            ),
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.plus_circled,
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    child: Text(
+                      'Scan QR Code',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+              onTap: () => showMaterialModalBottomSheet(
+                expand: false,
+                context: context,
+                backgroundColor: Colors.transparent,
+                builder: (context) => ModalChannelOpen(
+                  myWallet: widget.myWallet,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       // Building List of view based on channels
       Expanded(
