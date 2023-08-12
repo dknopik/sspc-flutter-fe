@@ -54,21 +54,15 @@ class Channel {
 
   void open(String other, BigInt myBal, BigInt otherBal) {
     _updateMetaData(other, myBal, otherBal);
-
   }
 
   void accept(String other, BigInt myBal, BigInt otherBal) {
     _updateMetaData(other, myBal, otherBal);
-
   }
 
-  void createCoopClose() {
+  void createCoopClose() {}
 
-  }
-
-  void coopClose() {
-
-  }
+  void coopClose() {}
 
   void sendMoney(BigInt value) {
     BigInt newMyBal = channel.myBal - value;
@@ -84,13 +78,11 @@ class Channel {
   }
 
   // helper
-  
+
   void _updateMetaData(String other, BigInt myBal, BigInt otherBal) {
     channel.us = wallet.privateKey.address.toString();
     channel.other = other;
     channel.myBal = myBal;
     channel.otherBal = otherBal;
   }
-
-
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,97 +12,316 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Simple Stupid Payment Channel',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const ChannelDetailScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class ChannelDetailScreen extends StatefulWidget {
+  const ChannelDetailScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ChannelDetailScreen> createState() => _ChannelDetailScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
+class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
   void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+    setState(() {});
   }
+
+  List<ChannelTransaction> testData = [
+    ChannelTransaction(
+        prevA: 1,
+        prevB: 14,
+        newA: 2,
+        newB: 13,
+        signedByA: false,
+        signedByB: true,
+        init: false,
+        sending: false),
+    ChannelTransaction(
+        prevA: 1,
+        prevB: 14,
+        newA: 0,
+        newB: 15,
+        signedByA: true,
+        signedByB: false,
+        init: false,
+        sending: true),
+    ChannelTransaction(
+        prevA: 0,
+        prevB: 15,
+        newA: 1,
+        newB: 14,
+        signedByA: true,
+        signedByB: true,
+        init: false,
+        sending: false),
+    ChannelTransaction(
+        prevA: 0,
+        prevB: 15,
+        newA: 1,
+        newB: 14,
+        signedByA: false,
+        signedByB: true,
+        init: false,
+        sending: false),
+    ChannelTransaction(
+        prevA: 0,
+        prevB: 15,
+        newA: 0,
+        newB: 15,
+        signedByA: true,
+        signedByB: true,
+        init: true,
+        sending: false),
+    ChannelTransaction(
+        prevA: 0,
+        prevB: 15,
+        newA: 0,
+        newB: 15,
+        signedByA: true,
+        signedByB: false,
+        init: true,
+        sending: false),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Channel with XX'),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'Current State',
+              style: TextStyle(
+                fontSize: 20,
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '2 unit',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Text(
+                  '<--->',
+                ),
+                Text(
+                  'XX: 13 unit',
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+              ],
             ),
+            const Text(
+              'Initial State',
+              style: TextStyle(
+                fontSize: 15,
+              ),
+            ),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '0 unit',
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  '<--->',
+                ),
+                Text(
+                  'XX: 15 unit',
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            if (testData[0].signedByA &&
+                testData[0]
+                    .signedByB) // last one settled, able to propose a new one
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    child: Column(
+                      children: [
+                        Icon(
+                          CupertinoIcons.arrow_up,
+                        ),
+                        Text('Send')
+                      ],
+                    ),
+                    onTap: () {},
+                  ),
+                  GestureDetector(
+                    child: Column(
+                      children: [
+                        Icon(
+                          CupertinoIcons.arrow_down,
+                        ),
+                        Text('Receive')
+                      ],
+                    ),
+                    onTap: () {},
+                  ),
+                  GestureDetector(
+                    child: Column(
+                      children: [
+                        Icon(
+                          CupertinoIcons.clear,
+                        ),
+                        Text('Close')
+                      ],
+                    ),
+                    onTap: () {
+                      print('cleared');
+                    },
+                  ),
+                ],
+              ),
+            if (!testData[0].signedByA ||
+                !testData[0].signedByB) // if either not signed, actions needed
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    testData[0].init
+                        ? CupertinoIcons.arrow_right_arrow_left
+                        : testData[0].sending
+                            ? CupertinoIcons.arrow_up
+                            : CupertinoIcons.arrow_down,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        !testData[0].init && testData[0].sending
+                            ? 'sending ${testData[0].prevA - testData[0].newA}'
+                            : !testData[0].init && !testData[0].sending
+                                ? 'receiving ${testData[0].newA - testData[0].prevA}'
+                                : ' ',
+                      ),
+                      Text(
+                        '${testData[0].newA} <-> ${testData[0].newB}',
+                      ),
+                    ],
+                  ),
+                  if (testData[0].signedByA) Text('waiting for confirmation'),
+                  if (testData[0].signedByB)
+                    Row(
+                      children: [
+                        GestureDetector(
+                          child: Column(
+                            children: [
+                              Icon(
+                                CupertinoIcons.check_mark,
+                              ),
+                              Text('Accept')
+                            ],
+                          ),
+                          onTap: () {
+                            //call function to sign
+                          },
+                        ),
+                        GestureDetector(
+                          child: Column(
+                            children: [
+                              Icon(
+                                CupertinoIcons.clear,
+                              ),
+                              Text('Reject')
+                            ],
+                          ),
+                          onTap: () {
+                            //call function to start a new transaction to dispute
+                          },
+                        )
+                      ],
+                    )
+                ],
+              ),
+            // pending only has two state: waiting for comfirmation or waiting to sign
+            // accept - go into history list; reject - start a different prop (old or new state) - pending from current side
+            Text('history transactions'),
+            // a list of all the proposed transactions, both signed and unsigned, in sequence
+            // highlight the ones signed by both parties - non proposal ones
+            Expanded(
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: testData.length,
+                itemBuilder: (context, i) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        testData[i].init
+                            ? CupertinoIcons.arrow_right_arrow_left
+                            : testData[i].sending
+                                ? CupertinoIcons.arrow_up
+                                : CupertinoIcons.arrow_down,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            !testData[i].init && testData[i].sending
+                                ? 'sending ${testData[i].prevA - testData[i].newA}'
+                                : !testData[i].init && !testData[i].sending
+                                    ? 'receiving ${testData[i].newA - testData[i].prevA}'
+                                    : ' ',
+                          ),
+                          Text(
+                            '${testData[i].newA} <-> ${testData[i].newB}',
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            testData[i].signedByA && !testData[i].signedByB
+                                ? CupertinoIcons.square_arrow_up
+                                : !testData[i].signedByA &&
+                                        testData[i].signedByB
+                                    ? CupertinoIcons.square_arrow_down
+                                    : CupertinoIcons.check_mark,
+                          ),
+                          Text(
+                            testData[i].signedByA && !testData[i].signedByB
+                                ? 'propose'
+                                : !testData[i].signedByA &&
+                                        testData[i].signedByB
+                                    ? 'request'
+                                    : 'settled',
+                          )
+                        ],
+                      )
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // receiver side: accept with signature; deny (what happens? send old transaction back?)
+            // ? can receiver also propose something that requires A's signature?
+            // history states: From who to who; value; signed by A/B; nonce/index
           ],
         ),
       ),
@@ -112,4 +332,27 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+class ChannelTransaction {
+  double prevA;
+  double prevB;
+  double newA;
+  double newB;
+  bool sending;
+  bool signedByA; //proposal
+  bool signedByB; //confirmation
+  bool
+      init; //case when it is not sending nor receiving, i.e., initial transaction or amount unchanged.
+
+  ChannelTransaction({
+    required this.prevA,
+    required this.prevB,
+    required this.newA,
+    required this.newB,
+    this.sending = false,
+    this.signedByA = false,
+    this.signedByB = false,
+    this.init = false,
+  });
 }
