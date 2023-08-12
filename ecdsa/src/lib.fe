@@ -1,0 +1,102 @@
+use std::evm
+use std::buf::MemoryBuffer
+use std::buf::MemoryBufferReader
+use std::buf::MemoryBufferWriter
+use std::buf::MemoryBufferWrite
+use std::precompiles::ec_recover
+
+fn u256_from_array(sig: Array<u8, 65>, offset: u256) -> u256 {
+    let mut i: u256 = 0;
+    let mut result: u256 = 0;
+    while i < 32 {
+        result += evm::shl(bits: 248 - (i * 8), value: sig[i + offset])
+        i += 1
+    }
+    return result
+}
+
+pub fn recover_from_array(hash: u256, sig: Array<u8, 65>) -> address {
+    let r: u256 = u256_from_array(sig, offset: 0)
+    let s: u256 = u256_from_array(sig, offset: 32)
+    let v: u8 = sig[64]
+    return recover(hash, r, s, v)
+}
+
+pub fn recover_from_buffer(hash: u256, sig: MemoryBuffer) -> address {
+    let mut sig_reader: MemoryBufferReader = sig.reader()
+    let r: u256 = sig_reader.read_u256()
+    let s: u256 = sig_reader.read_u256()
+    let v: u8 = sig_reader.read_u8()
+    return recover(hash, r, s, v)
+}
+
+pub fn recover(hash: u256, r: u256, s: u256, v: u8) -> address {
+    if s > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0 {
+        return 0
+    }
+
+    if v != 27 and v != 28 {
+        return 0
+    }
+
+    return ec_recover(hash, v, r, s)
+}
+
+pub fn to_eth_signed_message_hash(hash: u256) -> u256 {
+    let mut buf: MemoryBuffer = MemoryBuffer::new(len: 59)
+    let mut writer: MemoryBufferWriter = buf.writer()
+    u8(0x19).write_buf(writer)
+    u8(0x45).write_buf(writer)
+    u8(0x68).write_buf(writer)
+    u8(0x65).write_buf(writer)
+    u8(0x72).write_buf(writer)
+    u8(0x65).write_buf(writer)
+    u8(0x75).write_buf(writer)
+    u8(0x6D).write_buf(writer)
+    u8(0x20).write_buf(writer)
+    u8(0x53).write_buf(writer)
+    u8(0x69).write_buf(writer)
+    u8(0x67).write_buf(writer)
+    u8(0x6E).write_buf(writer)
+    u8(0x65).write_buf(writer)
+    u8(0x64).write_buf(writer)
+    u8(0x20).write_buf(writer)
+    u8(0x4D).write_buf(writer)
+    u8(0x65).write_buf(writer)
+    u8(0x73).write_buf(writer)
+    u8(0x73).write_buf(writer)
+    u8(0x61).write_buf(writer)
+    u8(0x67).write_buf(writer)
+    u8(0x65).write_buf(writer)
+    u8(0x3A).write_buf(writer)
+    u8(0x0A).write_buf(writer)
+    u8(0x33).write_buf(writer)
+    u8(0x32).write_buf(writer)
+    let mut i: u256 = 0
+    while i < 32 {
+        let byte: u8 = u8(evm::shr(bits: ((31 - i) * 8), value: hash))
+        byte.write_buf(writer)
+        i += 1
+    }
+    return evm::keccak256_mem(buf)
+}
+
+#test
+fn test_u256_from_array() {
+    //let test_array: Array<u8, 65> = [0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    //let number: u256 = u256_from_array(sig: test_array, offset: 3)
+    //assert number == 0x8000000000000000000000000000000000000000000000000000000000000001
+}
+
+#test
+fn test_recover() {
+    let hash: u256 = to_eth_signed_message_hash(hash: keccak256([u8(0x74), u8(0x65), u8(0x73), u8(0x74)]))
+    //assert hash == [0x58b84b4aa72f7f91bcfc42e6659976e9fbfab202fbab49cc9f99e6abd489118026151de6e6e1f61f21c5a97ab0a800b3768bd2131b667d5432ad9df3b4bcfa2f1c]
+    let addr: address = recover_from_array(hash, sig: [0x58, 0xb8, 0x4b, 0x4a, 0xa7, 0x2f, 0x7f, 0x91, 0xbc, 0xfc, 0x42, 0xe6, 0x65, 0x99, 0x76, 0xe9, 0xfb, 0xfa, 0xb2, 0x02, 0xfb, 0xab, 0x49, 0xcc, 0x9f, 0x99, 0xe6, 0xab, 0xd4, 0x89, 0x11, 0x80, 0x26, 0x15, 0x1d, 0xe6, 0xe6, 0xe1, 0xf6, 0x1f, 0x21, 0xc5, 0xa9, 0x7a, 0xb0, 0xa8, 0x00, 0xb3, 0x76, 0x8b, 0xd2, 0x13, 0x1b, 0x66, 0x7d, 0x54, 0x32, 0xad, 0x9d, 0xf3, 0xb4, 0xbc, 0xfa, 0x2f, 0x1c])
+    assert addr == 0xfbb261342ca9E146D0e241Ef45A216cF28B514Cf
+}
+
+#test
+fn test() {
+    assert u8(evm::shr(bits: ((31) * 8), value: 0x1200000000000000000000000000000000000000000000000000000000000001)) == 0x12
+}

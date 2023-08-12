@@ -1,4 +1,4 @@
-name = "safe_recover"
+name = "ecdsa"
 version = "1.0"
 
 [dependencies]
