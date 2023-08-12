@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/screens/modal_qr_scan.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -10,10 +11,12 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ModalChannelOpen extends StatefulWidget {
   final MyWallet myWallet;
+  final NFCNetwork network;
 
   const ModalChannelOpen({
     super.key,
     required this.myWallet,
+    required this.network
   });
 
   @override
@@ -211,7 +214,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   String other = "0x001234";
                   BigInt id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
-                  //widget.myNetwork.Send(id, )
+                  widget.network.send(List.from([fromID(id)]));
                 },
                 child: Container(
                   alignment: Alignment.center,

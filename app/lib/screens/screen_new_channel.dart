@@ -8,6 +8,7 @@ import 'package:app/screens/modal_reject_channel.dart';
 import 'package:app/screens/modal_show_qr_code.dart';
 import 'package:app/screens/screen_channel_detail_screen.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,10 +19,12 @@ import 'package:flutter/material.dart';
 
 class NewChannel extends StatefulWidget {
   final MyWallet myWallet;
+  final NFCNetwork nfcNetwork;
 
   const NewChannel({
     super.key,
     required this.myWallet,
+    required this.nfcNetwork,
   });
 
   @override
@@ -129,7 +132,7 @@ class _NewChannelState extends State<NewChannel> {
     ]));
   }
 
-  Widget _createChannel(ChannelObj channel) {
+  Widget _createChannel(ChannelObj channel, NFCNetwork network) {
     EthMetaData data = channel.currentState();
     if (channel.isActive()) {
       return Channel(
@@ -175,6 +178,7 @@ class _NewChannelState extends State<NewChannel> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => ChannelDetailScreen(
                     channel: channel,
+                    network: network,
                   )));
         },
         state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',

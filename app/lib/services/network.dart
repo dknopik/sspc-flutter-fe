@@ -23,7 +23,7 @@ class NFCNetwork {
         iosAlertMessage: "Scan your tag");
 
     // write NDEF records if applicable
-    if (tag.ndefWritable.isDefinedAndNotNull && tag.ndefWritable!) {
+    if (tag.ndefWritable != null && tag.ndefWritable!) {
       for (final object in objects) {
         await FlutterNfcKit.writeNDEFRecords(
             [ndef.TextRecord(text: jsonEncode(object.toJson()))]);
@@ -44,7 +44,7 @@ class NFCNetwork {
 
     List<NetworkMessage> list = List.empty(growable: true);
     // read NDEF records if available
-    if (tag.ndefAvailable.isDefinedAndNotNull && tag.ndefAvailable!) {
+    if (tag.ndefAvailable != null && tag.ndefAvailable!) {
       for (var record in await FlutterNfcKit.readNDEFRecords(cached: false)) {
         NetworkMessage networkMessage =
             NetworkMessage.fromJson(jsonDecode(record.toString()));
@@ -63,7 +63,7 @@ class NetworkMessage {
   BigInt otherBal;
   BigInt round;
   Uint8List signature;
-  String id;
+  BigInt id;
 
   NetworkMessage({
     required this.type,
@@ -81,7 +81,7 @@ class NetworkMessage {
       "otherBal": otherBal.toString(),
       "round": round.toString(),
       "signature": signature,
-      "id": id,
+      "id": id.toString(),
     };
   }
 
@@ -92,50 +92,22 @@ class NetworkMessage {
       otherBal: BigInt.parse(json["otherBal"]),
       round: BigInt.parse(json["round"]),
       signature: json["signature"],
-      id: json["id"] ?? "",
+      id: BigInt.parse(json["id"]),
     );
     return networkMessage;
   }
-//   fromString(String s) {
-//     List<String> subMsg = s.split("\n");
-//     type = int.parse(subMsg.first);
-//     message = s.substring(subMsg.first.length);
-//   }
 }
 
-// NetworkMessage IDasNM(BigInt id) {
-//   return NetworkMessage(type: 0, message: id.toString());
-// }
+NetworkMessage fromID(BigInt id) {
+  return NetworkMessage(type: 0, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: Uint8List(0), id: id);
+}
 
-// BigInt AsId(NetworkMessage msg) {
-//   if (msg.type == 0) {
-//     return BigInt.parse(msg.message);
-//   }
-//   throw const FormatException("invalid parameter");
-// }
+NetworkMessage fromStateUpdate(StateUpdate update) {
+  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: BigInt.zero);
+}
 
-// NetworkMessage StateUpdateasNM(StateUpdate update) {
-//   String message = "";
-//   message += update.myBal.toString();
-//   message += "\n";
-//   message += update.otherBal.toString();
-//   message += "\n";
-//   message += update.round.toString();
-//   message += "\n";
-//   message += update.signature.toHexString();
-//   return NetworkMessage(type: 1, message: message);
-// }
-
-StateUpdate NMasStateUpdate(NetworkMessage msg) {
+StateUpdate asStateUpdate(NetworkMessage msg) {
   if (msg.type == 1) {
-    // List<String> subMsg = msg.message.split("\n");
-    // if (subMsg.length != 4) {
-    //   throw const FormatException("invalid parameter");
-    // }
-    // BigInt myBal = BigInt.parse(subMsg.elementAt(0));
-    // BigInt otherBal = BigInt.parse(subMsg.elementAt(1));
-    // BigInt round = BigInt.parse(subMsg.elementAt(2));
-    // Uint8List signature = hexToUint8List(subMsg.elementAt(3));
     return StateUpdate(
         myBal: msg.myBal,
         otherBal: msg.otherBal,
@@ -143,20 +115,4 @@ StateUpdate NMasStateUpdate(NetworkMessage msg) {
         signature: msg.signature);
   }
   throw const FormatException("invalid parameter");
-}
-
-Uint8List hexToUint8List(String hex) {
-  if (hex.length % 2 != 0) {
-    throw 'Odd number of hex digits';
-  }
-  var l = hex.length ~/ 2;
-  var result = Uint8List(l);
-  for (var i = 0; i < l; ++i) {
-    var x = int.parse(hex.substring(2 * i, 2 * (i + 1)), radix: 16);
-    if (x.isNaN) {
-      throw 'Expected hex string';
-    }
-    result[i] = x;
-  }
-  return result;
 }

@@ -1,4 +1,5 @@
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -9,12 +10,14 @@ class ModalReject extends StatelessWidget {
   final int prevA;
   final int prevB;
   final ChannelObj channel;
+  final NFCNetwork network;
 
   ModalReject({
     super.key,
     required this.prevA,
     required this.prevB,
     required this.channel,
+    required this.network,
   });
 
   @override
@@ -49,6 +52,7 @@ class ModalReject extends StatelessWidget {
                       prevA: prevA,
                       prevB: prevB,
                       channel: channel,
+                      network: network,
                     ),
                   );
                 },
@@ -83,6 +87,7 @@ class ModalReject extends StatelessWidget {
                       prevA: prevA,
                       prevB: prevB,
                       channel: channel,
+                      network: network,
                     ),
                   );
                 },

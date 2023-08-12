@@ -3,6 +3,7 @@ import 'package:app/data/style.dart';
 import 'package:app/screens/screen_history_channels.dart';
 import 'package:app/screens/screen_new_channel.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
   final MyWallet myWallet = MyWallet();
+  final NFCNetwork network = NFCNetwork();
 
   BigInt onChainBalance = BigInt.from(0);
   BigInt totalBalance = BigInt.from(0);
@@ -50,6 +52,7 @@ class _AccountScreenState extends State<AccountScreen>
       NewChannel(
         key: ValueKey(1),
         myWallet: myWallet,
+        nfcNetwork: network,
       ),
       HistoryChannels(
         key: ValueKey(2),
