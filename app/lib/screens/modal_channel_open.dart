@@ -186,7 +186,6 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   BigInt id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
                   widget.network.send(List.from([fromID(id)]));
-                  //widget.myNetwork.Send(id, )
                 },
                 child: Container(
                   alignment: Alignment.center,

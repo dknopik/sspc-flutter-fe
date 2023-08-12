@@ -102,6 +102,10 @@ NetworkMessage fromID(BigInt id) {
   return NetworkMessage(type: 0, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: Uint8List(0), id: id);
 }
 
+NetworkMessage fromStateUpdate(StateUpdate update) {
+  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: BigInt.zero);
+}
+
 StateUpdate asStateUpdate(NetworkMessage msg) {
   if (msg.type == 1) {
     return StateUpdate(
@@ -111,20 +115,4 @@ StateUpdate asStateUpdate(NetworkMessage msg) {
         signature: msg.signature);
   }
   throw const FormatException("invalid parameter");
-}
-
-Uint8List hexToUint8List(String hex) {
-  if (hex.length % 2 != 0) {
-    throw 'Odd number of hex digits';
-  }
-  var l = hex.length ~/ 2;
-  var result = Uint8List(l);
-  for (var i = 0; i < l; ++i) {
-    var x = int.parse(hex.substring(2 * i, 2 * (i + 1)), radix: 16);
-    if (x.isNaN) {
-      throw 'Expected hex string';
-    }
-    result[i] = x;
-  }
-  return result;
 }

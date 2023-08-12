@@ -219,7 +219,7 @@ class _NewChannelState extends State<NewChannel> {
     // ]));
   }
 
-  Widget _createChannel(ChannelObj channel) {
+  Widget _createChannel(ChannelObj channel, NFCNetwork network) {
     EthMetaData data = channel.currentState();
     if (channel.isActive()) {
       return Channel(
@@ -265,6 +265,7 @@ class _NewChannelState extends State<NewChannel> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => ChannelDetailScreen(
                     channel: channel,
+                    network: network,
                   )));
         },
         state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',

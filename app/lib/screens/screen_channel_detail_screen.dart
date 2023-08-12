@@ -3,6 +3,7 @@ import 'package:app/screens/modal_accept.dart';
 import 'package:app/screens/modal_close.dart';
 import 'package:app/screens/modal_reject.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -11,10 +12,12 @@ import 'modal_propose.dart';
 
 class ChannelDetailScreen extends StatefulWidget {
   final ChannelObj channel;
+  final NFCNetwork network;
 
   ChannelDetailScreen({
     super.key,
     required this.channel,
+    required this.network,
   });
 
   @override
@@ -291,7 +294,8 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                             sending: true,
                             prevA: a,
                             prevB: b,
-                            channel: widget.channel),
+                            channel: widget.channel,
+                            network: widget.network),
                       ),
                     ),
                   ),
@@ -324,6 +328,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           prevA: a,
                           prevB: b,
                           channel: widget.channel,
+                          network: widget.network,
                         ),
                       ),
                     ),
@@ -429,6 +434,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                             prevA: a,
                                             prevB: b,
                                             channel: widget.channel,
+                                            network: widget.network,
                                           ),
                                         );
                                       },

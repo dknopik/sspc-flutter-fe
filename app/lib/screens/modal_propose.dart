@@ -1,4 +1,5 @@
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -8,6 +9,7 @@ class ModalPropose extends StatefulWidget {
   final int prevA;
   final int prevB;
   final ChannelObj channel;
+  final NFCNetwork network;
 
   ModalPropose({
     super.key,
@@ -15,6 +17,7 @@ class ModalPropose extends StatefulWidget {
     required this.prevA,
     required this.prevB,
     required this.channel,
+    required this.network,
   });
 
   @override
@@ -171,7 +174,8 @@ class _ModalProposeState extends State<ModalPropose> {
                 onTap: () {
                   Navigator.pop(context);
                   if (widget.sending) {
-                    widget.channel.sendMoney(BigInt.from(money));
+                    StateUpdate update = widget.channel.sendMoney(BigInt.from(money));
+                    widget.network.send(List.from([fromStateUpdate(update)]));
                   }
                 },
                 child: Container(
