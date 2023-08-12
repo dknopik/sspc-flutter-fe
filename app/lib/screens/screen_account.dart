@@ -1,4 +1,5 @@
 import 'package:app/components/default_sliver_app_bar_title.dart';
+import 'package:app/data/style.dart';
 import 'package:app/screens/screen_history_channels.dart';
 import 'package:app/screens/screen_new_channel.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,14 +47,61 @@ class _AccountScreenState extends State<AccountScreen>
                   automaticallyImplyLeading: false,
                   titleSpacing: 0,
                   title: DefaultSliverAppBarTitle(
-                    child: Text(
-                      'Title',
-                      style: TextStyle(color: Colors.black),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: CircleAvatar(
+                            radius: 15.0,
+                            backgroundColor: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.blue,
+                                    Colors.green
+                                  ], // Your gradient colors
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        RichText(
+                            text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'SSPC',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                height: 1.1,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' Wallet',
+                              style: TextStyle(
+                                color: Color(0xFF565559),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                                height: 1.1,
+                              ),
+                            )
+                          ],
+                        )),
+                        SizedBox(
+                          width: 35,
+                        ),
+                      ],
                     ),
                   ),
                   primary: true,
                   pinned: true,
-                  expandedHeight: 200,
+                  expandedHeight: 180,
                   toolbarHeight: 50,
                   flexibleSpace: LayoutBuilder(
                     builder: (context, constraints) {
@@ -67,19 +115,79 @@ class _AccountScreenState extends State<AccountScreen>
                               opacity:
                                   _getOpacity(context, constraints.maxHeight),
                               child: Container(
+                                  margin: const EdgeInsets.all(20.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: Color(0xFFF6F7FC),
+                                  ),
+                                  padding: const EdgeInsets.all(20.0),
                                   child: Row(
-                                children: [
-                                  Text('User Title'),
-                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text('Hello, xxx'),
-                                      Text('your balance'),
-                                      Text('1254 Units'),
-                                      Text('1254 Units Consolidated'),
+                                      CircleAvatar(
+                                        radius: 30.0,
+                                        backgroundColor: Colors.transparent,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.blue,
+                                                Colors.green
+                                              ], // Your gradient colors
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'Your balance',
+                                            style: Style.normal,
+                                          ),
+                                          SizedBox(
+                                            height: 15,
+                                          ),
+                                          // Text(
+                                          //   'your balance',
+                                          //   style: Style.hidden,
+                                          // ),
+                                          RichText(
+                                              text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: '1254',
+                                                style: Style.title,
+                                              ),
+                                              TextSpan(
+                                                text: '.00 wei',
+                                                style: TextStyle(
+                                                  color: Color(0xFF565559),
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400,
+                                                  height: 1.1,
+                                                ),
+                                              )
+                                            ],
+                                          )),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                            '1102.00 wei confirmed',
+                                            style: Style.hidden,
+                                          ),
+                                        ],
+                                      )
                                     ],
-                                  )
-                                ],
-                              )),
+                                  )),
                             ),
                           ),
                         ],
@@ -100,8 +208,10 @@ class _AccountScreenState extends State<AccountScreen>
                         ),
                         child: TabBar(
                           controller: _tabController,
-                          labelColor: Colors.blue,
-                          unselectedLabelColor: Colors.grey,
+                          labelColor: Colors.black,
+                          indicatorColor: Colors.black,
+                          unselectedLabelColor: Color(0xFF565559),
+                          dividerColor: Colors.black,
                           tabs: [
                             Text('Current Channels'),
                             Text('History'),
