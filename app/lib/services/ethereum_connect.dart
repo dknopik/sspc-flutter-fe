@@ -23,7 +23,7 @@ class MyWallet {
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
   late List<ChannelObj> channels;
 
-  void init() async {
+  Future<void> init() async {
     // Create (or open) wallet
     try {
       String content = File("wallet.json").readAsStringSync();

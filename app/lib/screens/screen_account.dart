@@ -15,14 +15,28 @@ class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
   final MyWallet myWallet = MyWallet();
 
+  int onChainBalance = 0;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    super.setState(() {}); // to update widget data
     print("init");
-    myWallet.init();
+    await myWallet.init();
     // get onchain confirmed balance
     // get balance across all channels
+    print('get balance');
+    String balance = await myWallet.getOnChainBalance();
+    print(balance);
+    onChainBalance = int.tryParse(balance) ?? 0;
+    print(onChainBalance);
   }
 
   @override
