@@ -26,13 +26,16 @@ class MyWallet {
   Future<void> init() async {
     // Create (or open) wallet
     try {
-      String content = File("wallet.json").readAsStringSync();
+      String content = File(path).readAsStringSync();
       wallet = Wallet.fromJson(content, password);
+      print("Successfully read wallet from file");
     } catch (e) {
+      print(e);
       print("Wallet not found, creating new wallet.json");
       var rng = Random.secure();
       EthPrivateKey random = EthPrivateKey.createRandom(rng);
-      wallet = Wallet.createNew(random, "password", rng);
+      wallet = Wallet.createNew(random, password, rng);
+      File(path).writeAsString(wallet.toJson());
       print(wallet.toJson());
     }
     // connect to RPC client
