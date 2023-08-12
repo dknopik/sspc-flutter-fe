@@ -40,6 +40,7 @@ class _AccountScreenState extends State<AccountScreen>
     totalBalance = await myWallet.getTotalBalance();
     print('started listener');
     network.startListener(context, myWallet);
+    super.setState(() {}); // to update widget data
   }
 
   @override

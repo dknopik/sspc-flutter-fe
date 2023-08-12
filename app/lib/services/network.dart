@@ -59,6 +59,7 @@ class NFCNetwork {
   }
 
   void send(List<NetworkMessage> objects) async {
+    print("sending");
     if (!await isAvailable()) {
       return;
     }

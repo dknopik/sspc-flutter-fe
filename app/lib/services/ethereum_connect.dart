@@ -125,7 +125,7 @@ class ChannelObj {
   Web3Client client;
   Channel contract;
   late EthMetaData metadata;
-  late List<StateUpdate> history;
+  List<StateUpdate> history = List.empty(growable: true);
 
   ChannelObj({
     required this.wallet,
@@ -329,7 +329,7 @@ class ChannelObj {
 }
 
 BigInt randomBigInt() {
-  const size = 256;
+  const size = 32;
   final random = Random.secure();
   BigInt result = BigInt.zero;
   for (var i = 0; i < size; i++) {
