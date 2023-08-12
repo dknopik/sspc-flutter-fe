@@ -26,7 +26,11 @@ class MetaData {
   });
 
   Uint8List encode() {
-    return Rlp.encode([us, other, myBal, otherBal, round]);
+    if (isProposer) {
+      return Rlp.encode([us, other, myBal, otherBal, round]);
+    } else {
+      return Rlp.encode([other, us, otherBal, myBal, round]);
+    }
   }
 }
 
@@ -72,6 +76,10 @@ class ChannelObj {
       print(e);
     }
     return "";
+  }
+
+  bool isActive() {
+    return metadata.round != BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
   }
 
   // Channel API
@@ -122,8 +130,12 @@ class ChannelObj {
     if (value <= BigInt.zero) {
       throw const FormatException("invalid parameter");
     }
+    if (!isActive()) {
+      throw const FormatException("sending on closed channel forbidden");
+    }
     BigInt newMyBal = metadata.myBal - value;
     BigInt newOtherBal = metadata.otherBal + value;
+    metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
     return wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
   }
@@ -137,7 +149,9 @@ class ChannelObj {
       throw const FormatException("invalid parameter, trying to take money");
     }
     // verify sig
-    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: myBal, otherBal: otherBal, isProposer: metadata.isProposer);
+    bool otherProposer = !metadata.isProposer;
+    MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: myBal, otherBal: otherBal, isProposer: otherProposer);
+    toTest.round = metadata.round + BigInt.one; // implicitly makes sure that the peer only signed round + 1
     /*
     Uint8List hash = keccak256(toTest);
     if (!isValidSignature(hash, sig, metadata.other)) {
