@@ -21,7 +21,7 @@ class MyWallet {
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
-  List<ChannelObj> channels = new List.empty(growable: true);
+  List<ChannelObj> channels = List.empty(growable: true);
 
   Future<void> init() async {
     // Create (or open) wallet
