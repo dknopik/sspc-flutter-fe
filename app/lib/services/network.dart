@@ -23,7 +23,7 @@ class NFCNetwork {
         iosAlertMessage: "Scan your tag");
 
     // write NDEF records if applicable
-    if (tag.ndefWritable.isDefinedAndNotNull && tag.ndefWritable!) {
+    if (tag.ndefWritable != null && tag.ndefWritable!) {
       for (final object in objects) {
         await FlutterNfcKit.writeNDEFRecords(
             [ndef.TextRecord(text: jsonEncode(object.toJson()))]);
@@ -44,7 +44,7 @@ class NFCNetwork {
 
     List<NetworkMessage> list = List.empty(growable: true);
     // read NDEF records if available
-    if (tag.ndefAvailable.isDefinedAndNotNull && tag.ndefAvailable!) {
+    if (tag.ndefAvailable != null && tag.ndefAvailable!) {
       for (var record in await FlutterNfcKit.readNDEFRecords(cached: false)) {
         NetworkMessage networkMessage =
             NetworkMessage.fromJson(jsonDecode(record.toString()));
