@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:web3dart/web3dart.dart';
+import 'package:web3dart/crypto.dart';
+import 'package:web3dart/credentials.dart';
 import 'package:rlp/rlp.dart';
 
 const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
@@ -204,19 +206,18 @@ class ChannelObj {
     bool otherProposer = !metadata.isProposer;
     MetaData toTest = MetaData(id: metadata.id, us: metadata.us, other: metadata.other, myBal: update.myBal, otherBal: update.otherBal, isProposer: otherProposer);
     toTest.round = metadata.round + BigInt.one; // implicitly makes sure that the peer only signed round + 1
-    /*
-    Uint8List hash = keccak256(toTest);
-    if (!isValidSignature(hash, sig, metadata.other)) {
+    
+    Uint8List hash = keccak256(toTest.encode());
+    Uint8List pk = ecRecover(hash, uint8ListToSig(update.signature));
+    if (publicKeyToAddress(pk) != metadata.other.addressBytes) {
       throw const FormatException("invalid parameter, invalid signature");
     }
-    */
     // Update state
     history.add(update);
     _updateBalances(update.myBal, update.otherBal);
   }
 
   // helper
-
   void _updateBalances(BigInt myBal, BigInt otherBal) {
     metadata.myBal = myBal;
     metadata.otherBal = otherBal;
@@ -230,6 +231,22 @@ BigInt randomBigInt() {
   BigInt result = BigInt.zero;
   for (var i = 0; i < size; i++) {
     result |= BigInt.from(random.nextInt(256)) << (8 * i);
+  }
+  return result;
+}
+
+MsgSignature uint8ListToSig(Uint8List list) {
+  BigInt r = bytesToBigInt(list.sublist(0, 32));
+  BigInt s = bytesToBigInt(list.sublist(32, 64));
+  int v = list.elementAt(64);
+  return MsgSignature(r, s, v);
+}
+
+/// Converts a [Uint8List] byte buffer into a [BigInt]
+BigInt bytesToBigInt(Uint8List bytes) {
+  BigInt result = BigInt.zero;
+  for (final byte in bytes) {
+    result =  BigInt.from(byte) | (result << 8);
   }
   return result;
 }
