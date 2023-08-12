@@ -19,8 +19,8 @@ class MyWallet {
   late BigInt chainID;
   String path = "wallet.json";
   String password = "YesIHardcodeMyPasswords";
-  String rpc = "http://127.0.0.1:8545";
-  String contractAddr = "0x000";
+  String rpc = "https://rpc.public.zkevm-test.net";
+  String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
   late List<ChannelObj> channels;
 
   void init() async {
