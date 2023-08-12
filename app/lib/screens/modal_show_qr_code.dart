@@ -31,12 +31,10 @@ class _ModalQRState extends State<ModalQR> {
         child: Wrap(
           alignment: WrapAlignment.center,
           children: <Widget>[
-            Expanded(
-              child: Center(
-                child: SizedBox(
-                  width: 280,
-                  child: widget.builder,
-                ),
+            Center(
+              child: SizedBox(
+                width: 200,
+                child: widget.builder,
               ),
             ),
           ],

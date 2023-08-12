@@ -53,6 +53,8 @@ dev_dependencies:
   modal_bottom_sheet: 3.0.0-pre
   flutter_keyboard_visibility: ^5.0.3
   flutter_nfc_kit: ^3.3.1
+  qr_flutter: ^4.1.0
+  qr_code_scanner: ^1.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

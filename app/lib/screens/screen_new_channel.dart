@@ -33,187 +33,100 @@ class _NewChannelState extends State<NewChannel> {
 
   @override
   Widget build(BuildContext context) {
-    final FutureBuilder<ui.Image> qrFutureBuilder = FutureBuilder<ui.Image>(
-      future: _loadOverlayImage(),
-      builder: (BuildContext ctx, AsyncSnapshot<ui.Image> snapshot) {
-        const double size = 280.0;
-        if (!snapshot.hasData) {
-          return const SizedBox(width: size, height: size);
-        }
-        return CustomPaint(
-          size: const Size.square(size),
-          painter: QrPainter(
-            data: message,
-            version: QrVersions.auto,
-            eyeStyle: const QrEyeStyle(
-              eyeShape: QrEyeShape.square,
-              color: Color(0xff128760),
+    return Container(
+        child: Column(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(10.0),
+            width: 130,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Style.background,
             ),
-            dataModuleStyle: const QrDataModuleStyle(
-              dataModuleShape: QrDataModuleShape.circle,
-              color: Color(0xff1a5441),
-            ),
-            // size: 320.0,
-            embeddedImage: snapshot.data,
-            embeddedImageStyle: const QrEmbeddedImageStyle(
-              size: Size.square(60),
-            ),
-          ),
-        );
-      },
-    );
-
-    return Material(
-      color: Colors.white,
-      child: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Center(
-                child: SizedBox(
-                  width: 280,
-                  child: qrFutureBuilder,
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.plus_circled,
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    child: Text(
+                      'Open Channel',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+              onTap: () => showMaterialModalBottomSheet(
+                expand: false,
+                context: context,
+                backgroundColor: Colors.transparent,
+                builder: (context) => ModalChannelOpen(
+                  myWallet: widget.myWallet,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40)
-                  .copyWith(bottom: 40),
-              child: const Text('essag'),
+          ),
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            width: 130,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Style.background,
             ),
-          ],
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.plus_circled,
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    child: Text(
+                      'QR Code',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+              onTap: () => showMaterialModalBottomSheet(
+                expand: false,
+                context: context,
+                backgroundColor: Colors.transparent,
+                builder: (context) => ModalQR(
+                  builder: QrImageView(
+                    data: message,
+                    version: QrVersions.auto,
+                    size: 200.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      // Building List of view based on channels
+      Expanded(
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: widget.myWallet.channels.length,
+          itemBuilder: (context, i) {
+            return _createChannel(widget.myWallet.channels[i]);
+          },
         ),
       ),
-    );
-
-    // Container(
-    //     child: Column(children: [
-    //   Row(
-    //     children: [
-    //       Container(
-    //         margin: const EdgeInsets.all(20.0),
-    //         width: 180,
-    //         height: 100,
-    //         decoration: BoxDecoration(
-    //           borderRadius: BorderRadius.circular(20),
-    //           color: Style.background,
-    //         ),
-    //         alignment: Alignment.center,
-    //         child: GestureDetector(
-    //           child: Column(
-    //             mainAxisAlignment: MainAxisAlignment.center,
-    //             children: [
-    //               Icon(
-    //                 CupertinoIcons.plus_circled,
-    //               ),
-    //               SizedBox(height: 10),
-    //               SizedBox(
-    //                 child: Text(
-    //                   'Open Channel',
-    //                   textAlign: TextAlign.center,
-    //                 ),
-    //               )
-    //             ],
-    //           ),
-    //           onTap: () => showMaterialModalBottomSheet(
-    //             expand: false,
-    //             context: context,
-    //             backgroundColor: Colors.transparent,
-    //             builder: (context) => ModalChannelOpen(
-    //               myWallet: widget.myWallet,
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //       Container(
-    //         margin: const EdgeInsets.all(20.0),
-    //         width: 180,
-    //         height: 100,
-    //         decoration: BoxDecoration(
-    //           borderRadius: BorderRadius.circular(20),
-    //           color: Style.background,
-    //         ),
-    //         alignment: Alignment.center,
-    //         child: GestureDetector(
-    //           child: Column(
-    //             mainAxisAlignment: MainAxisAlignment.center,
-    //             children: [
-    //               // Icon(
-    //               //   CupertinoIcons.plus_circled,
-    //               // ),
-    //               // SizedBox(height: 10),
-    //               // SizedBox(
-    //               //   child: Text(
-    //               //     'Generate QR Code',
-    //               //     textAlign: TextAlign.center,
-    //               //   ),
-    //               // )
-
-    //               SizedBox(
-    //                 width: 280,
-    //                 child: qrFutureBuilder,
-    //               ),
-    //             ],
-    //           ),
-    //           onTap: () => showMaterialModalBottomSheet(
-    //             expand: false,
-    //             context: context,
-    //             backgroundColor: Colors.transparent,
-    //             builder: (context) => ModalQR(
-    //               builder: qrFutureBuilder,
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //       Container(
-    //         margin: const EdgeInsets.all(20.0),
-    //         width: 180,
-    //         height: 100,
-    //         decoration: BoxDecoration(
-    //           borderRadius: BorderRadius.circular(20),
-    //           color: Style.background,
-    //         ),
-    //         alignment: Alignment.center,
-    //         child: GestureDetector(
-    //           child: Column(
-    //             mainAxisAlignment: MainAxisAlignment.center,
-    //             children: [
-    //               Icon(
-    //                 CupertinoIcons.plus_circled,
-    //               ),
-    //               SizedBox(height: 10),
-    //               SizedBox(
-    //                 child: Text(
-    //                   'Scan QR Code',
-    //                   textAlign: TextAlign.center,
-    //                 ),
-    //               )
-    //             ],
-    //           ),
-    //           onTap: () => showMaterialModalBottomSheet(
-    //             expand: false,
-    //             context: context,
-    //             backgroundColor: Colors.transparent,
-    //             builder: (context) => ModalChannelOpen(
-    //               myWallet: widget.myWallet,
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    //   // Building List of view based on channels
-    //   Expanded(
-    //     child: ListView.builder(
-    //       scrollDirection: Axis.vertical,
-    //       shrinkWrap: true,
-    //       itemCount: widget.myWallet.channels.length,
-    //       itemBuilder: (context, i) {
-    //         return _createChannel(widget.myWallet.channels[i]);
-    //       },
-    //     ),
-    //   ),
-    // ]));
+    ]));
   }
 
   Widget _createChannel(ChannelObj channel) {

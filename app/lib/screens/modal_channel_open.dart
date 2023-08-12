@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:app/screens/modal_qr_scan.dart';
 import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ModalChannelOpen extends StatefulWidget {
   final MyWallet myWallet;
@@ -20,6 +25,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
   int b = 0;
   final _controllerA = TextEditingController();
   final _controllerB = TextEditingController();
+  final _controllerO = TextEditingController();
   bool _isKeyboardVisible = false;
 
   @override
@@ -55,6 +61,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
           alignment: WrapAlignment.center,
           children: <Widget>[
             if (_isKeyboardVisible) SizedBox(height: 16),
+
             Column(
               // TODO no need for A B state when openning channel?
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,13 +149,35 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
 
             //only as placeholder
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
                   height: 20,
                 ),
-                Text('Opponent Address'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Opponent Address'),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    GestureDetector(
+                      child: Text('Scan QR Code'),
+                      onTap: () async {
+                        String? result = await showMaterialModalBottomSheet(
+                          expand: false,
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => ModalPQRScan(),
+                        );
+                        setState(() {
+                          _controllerO.text = result ?? '';
+                        });
+                      },
+                    )
+                  ],
+                ),
                 SizedBox(
                   height: 10,
                 ),
@@ -156,7 +185,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   height: 50,
                   width: 250,
                   child: TextField(
-                    controller: TextEditingController(),
+                    controller: _controllerO,
                     decoration: InputDecoration(
                       floatingLabelStyle: TextStyle(color: Color(0xFF565559)),
                       labelText: 'enter the address of opponent party',
