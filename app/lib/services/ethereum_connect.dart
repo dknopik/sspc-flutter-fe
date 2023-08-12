@@ -9,8 +9,9 @@ import 'package:web3dart/crypto.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:rlp/rlp.dart';
 
-const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
+const COOPERATIVE_CLOSE_ROUND = "ffffffffffffffffffffffffffffffff";
 const FILTER_OFFSET = 1000;
+  String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
 
 class MyWallet {
   late Wallet wallet;
@@ -84,7 +85,7 @@ class EthMetaData {
   BigInt myBal;
   BigInt otherBal;
   bool isProposer;
-  late BigInt round;
+  BigInt round;
 
   EthMetaData({
     required this.id,
@@ -93,6 +94,7 @@ class EthMetaData {
     required this.myBal,
     required this.otherBal,
     required this.isProposer,
+    required this.round,
   });
 
   Uint8List encode() {
@@ -124,7 +126,7 @@ class ChannelObj {
   Wallet wallet;
   Web3Client client;
   Channel contract;
-  late EthMetaData metadata;
+  EthMetaData metadata = EthMetaData(id: BigInt.zero, us: EthereumAddress.fromHex(contractAddr) , other: EthereumAddress.fromHex(contractAddr), myBal: BigInt.zero, otherBal: BigInt.zero, isProposer: false, round: BigInt.zero);
   List<StateUpdate> history = List.empty(growable: true);
 
   ChannelObj({
@@ -158,7 +160,8 @@ class ChannelObj {
         other: otherAddr,
         myBal: myBal,
         otherBal: otherBal,
-        isProposer: true);
+        isProposer: true,
+        round: BigInt.zero);
     // Update History
     history.add(StateUpdate(
         id: id,
@@ -184,7 +187,8 @@ class ChannelObj {
         other: otherAddr,
         myBal: myBal,
         otherBal: otherBal,
-        isProposer: false);
+        isProposer: false,
+        round: BigInt.zero);
     // Update History
     history.add(StateUpdate(
         id: id,
@@ -265,9 +269,9 @@ class ChannelObj {
         other: metadata.other,
         myBal: update.myBal,
         otherBal: update.otherBal,
-        isProposer: otherProposer);
+        isProposer: otherProposer,
+        round: metadata.round + BigInt.one);
     // implicitly makes sure that the peer only signed round + 1
-    toTest.round = metadata.round + BigInt.one; 
 
     Uint8List hash = keccak256(toTest.encode());
     Uint8List pk = ecRecover(
