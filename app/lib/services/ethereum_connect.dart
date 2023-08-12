@@ -48,17 +48,24 @@ class MyWallet {
     return obj;
   }
 
-  Future<String> getOnChainBalance() async {
+  Future<BigInt> getTotalBalance() async {
+    BigInt bal = await getOnChainBalance();
+    for (final channel in channels) {
+      bal += channel.metadata.myBal;
+    }
+    return bal;
+  }
+
+  Future<BigInt> getOnChainBalance() async {
     try {
       EtherAmount balance = await client.getBalance(wallet.privateKey.address);
-      print(balance.getValueInUnit(EtherUnit.ether).toString());
-      return balance.getValueInUnit(EtherUnit.ether).toString();
+      print(balance.getInWei);
+      return balance.getInWei;
     } catch (e) {
       print(e);
     }
-    return "";
+    return BigInt.zero;
   }
-
 }
 
 class MetaData {
