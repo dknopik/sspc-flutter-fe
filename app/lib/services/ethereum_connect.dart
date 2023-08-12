@@ -10,6 +10,7 @@ import 'package:web3dart/credentials.dart';
 import 'package:rlp/rlp.dart';
 
 const COOPERATIVE_CLOSE_ROUND = "0xffffffffffffffffffffffffffffffff";
+const FILTER_OFFSET = 1000;
 
 class MyWallet {
   late Wallet wallet;
@@ -208,13 +209,51 @@ class ChannelObj {
     toTest.round = metadata.round + BigInt.one; // implicitly makes sure that the peer only signed round + 1
     
     Uint8List hash = keccak256(toTest.encode());
-    Uint8List pk = ecRecover(hash, uint8ListToSig(update.signature));
+    Uint8List pk = ecRecover(hash, uint8ListToSig(update.signature)); // you can probably malleability attack this!
     if (publicKeyToAddress(pk) != metadata.other.addressBytes) {
       throw const FormatException("invalid parameter, invalid signature");
     }
     // Update state
     history.add(update);
     _updateBalances(update.myBal, update.otherBal);
+  }
+
+  // Event filtering
+
+  Future<Stream<Open>> waitForOpenEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.openEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Accepted>> waitForAcceptedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.acceptedEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Closing>> waitForClosingEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.closingEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Closed>> waitForClosedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.closedEvents(fromBlock: from, toBlock: BlockNum.current());
   }
 
   // helper
