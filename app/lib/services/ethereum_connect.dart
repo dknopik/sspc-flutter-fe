@@ -40,7 +40,7 @@ class MyWallet {
   }
 
   ChannelObj createNewChannel() {
-    ChannelObj obj = ChannelObj(wallet: wallet, channel: contract, client: client);
+    ChannelObj obj = ChannelObj(wallet: wallet, contract: contract, client: client);
     channels.add(obj);
     return obj;
   }
@@ -102,12 +102,13 @@ class StateUpdate {
 class ChannelObj {
   Wallet wallet;
   Web3Client client;
-  Channel channel;
+  Channel contract;
   late MetaData metadata;
+  late List<StateUpdate> history;
 
   ChannelObj({
     required this.wallet,
-    required this.channel,
+    required this.contract,
     required this.client,
   });
 
@@ -126,9 +127,11 @@ class ChannelObj {
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await channel.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey, transaction: tx);
+    String res = await contract.open(id, myAddr, myBal, otherBal, credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: true);
+    // Update History
+    history.add(StateUpdate(myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: Uint8List(0)));
   }
 
   void accept(BigInt id, String other, BigInt myBal, BigInt otherBal) async {
@@ -136,9 +139,11 @@ class ChannelObj {
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx = Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await channel.accept(id, credentials: wallet.privateKey, transaction: tx);
+    String res = await contract.accept(id, credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = MetaData(id: id, us: myAddr, other: otherAddr, myBal: myBal, otherBal: otherBal, isProposer: false);
+    // Update History
+    history.add(StateUpdate(myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: Uint8List(0)));
   }
 
   Uint8List createCoopClose() {
@@ -156,7 +161,7 @@ class ChannelObj {
       valueA = metadata.otherBal;
       valueB = metadata.myBal;
     }
-    String res = await channel.cooperative_close(metadata.id, valueA, valueB, sig, credentials: wallet.privateKey);
+    String res = await contract.cooperative_close(metadata.id, valueA, valueB, sig, credentials: wallet.privateKey);
     // update metadata
     metadata.round = BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
   }
@@ -173,7 +178,10 @@ class ChannelObj {
     metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
     Uint8List sig = wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
-    return StateUpdate(myBal: newMyBal, otherBal: newOtherBal, round: metadata.round , signature: sig);
+    // Update History
+    StateUpdate update = StateUpdate(myBal: newMyBal, otherBal: newOtherBal, round: metadata.round , signature: sig);
+    history.add(update);
+    return update;
   }
 
   void receivedMoney(StateUpdate update) {
@@ -202,6 +210,8 @@ class ChannelObj {
       throw const FormatException("invalid parameter, invalid signature");
     }
     */
+    // Update state
+    history.add(update);
     _updateBalances(update.myBal, update.otherBal);
   }
 
