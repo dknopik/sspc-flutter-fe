@@ -73,6 +73,7 @@ class _NewChannelState extends State<NewChannel> {
                 backgroundColor: Colors.transparent,
                 builder: (context) => ModalChannelOpen(
                   myWallet: widget.myWallet,
+                  network: widget.nfcNetwork,
                 ),
               ),
             ),
@@ -125,7 +126,7 @@ class _NewChannelState extends State<NewChannel> {
           shrinkWrap: true,
           itemCount: widget.myWallet.channels.length,
           itemBuilder: (context, i) {
-            return _createChannel(widget.myWallet.channels[i]);
+            return _createChannel(widget.myWallet.channels[i], widget.nfcNetwork);
           },
         ),
       ),
@@ -153,6 +154,7 @@ class _NewChannelState extends State<NewChannel> {
               backgroundColor: Colors.transparent,
               builder: (context) => ModalClose(
                 channel: channel,
+                network: network,
               ),
             ),
           ),

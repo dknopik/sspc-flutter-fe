@@ -359,6 +359,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         backgroundColor: Colors.transparent,
                         builder: (context) => ModalClose(
                           channel: widget.channel,
+                          network: widget.network,
                         ),
                       ),
                     ),

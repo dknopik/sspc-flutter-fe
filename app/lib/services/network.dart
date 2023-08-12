@@ -106,6 +106,10 @@ NetworkMessage fromStateUpdate(StateUpdate update) {
   return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: BigInt.zero);
 }
 
+NetworkMessage fromSig(Uint8List signature) {
+  return NetworkMessage(type: 1, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: BigInt.zero);
+}
+
 StateUpdate asStateUpdate(NetworkMessage msg) {
   if (msg.type == 1) {
     return StateUpdate(

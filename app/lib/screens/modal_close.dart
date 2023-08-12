@@ -1,11 +1,13 @@
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ModalClose extends StatelessWidget {
   final ChannelObj channel;
+  final NFCNetwork network;
 
-  ModalClose({required this.channel});
+  ModalClose({required this.channel, required this.network});
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +31,8 @@ class ModalClose extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.pop(context);
-                  // todo network save to netwrok
-                  Uint8List id = channel.createCoopClose();
+                  Uint8List sig = channel.createCoopClose();
+                  network.send(List.from([fromSig(sig)]));
                 },
                 child: Container(
                   alignment: Alignment.center,
