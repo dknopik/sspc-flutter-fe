@@ -50,6 +50,8 @@ dev_dependencies:
   rlp: ^2.0.0
   web3dart_builders: ^0.0.7
   build_runner: ^2.0.0
+  modal_bottom_sheet: 3.0.0-pre
+  flutter_keyboard_visibility: ^5.0.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
