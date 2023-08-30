@@ -32,7 +32,6 @@ class NewChannel extends StatefulWidget {
 }
 
 class _NewChannelState extends State<NewChannel> {
-  String message = "this is the address";
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +108,7 @@ class _NewChannelState extends State<NewChannel> {
                 backgroundColor: Colors.transparent,
                 builder: (context) => ModalQR(
                   builder: QrImageView(
-                    data: message,
+                    data: this.widget.myWallet.Address(),
                     version: QrVersions.auto,
                     size: 200.0,
                   ),

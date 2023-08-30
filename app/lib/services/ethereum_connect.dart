@@ -42,9 +42,12 @@ class MyWallet {
     // connect to RPC client
     client = Web3Client(rpc, Client());
     EthereumAddress addr = EthereumAddress.fromHex(contractAddr);
-    print(wallet.privateKey.address);
     chainID = await client.getChainId();
     contract = Channel(address: addr, client: client, chainId: chainID.toInt());
+  }
+
+  String Address() {
+    return wallet.privateKey.address.hexEip55;
   }
 
   ChannelObj createNewChannel() {
