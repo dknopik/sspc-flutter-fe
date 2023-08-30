@@ -108,7 +108,7 @@ class _NewChannelState extends State<NewChannel> {
                 backgroundColor: Colors.transparent,
                 builder: (context) => ModalQR(
                   builder: QrImageView(
-                    data: this.widget.myWallet.Address(),
+                    data: widget.myWallet.Address(),
                     version: QrVersions.auto,
                     size: 200.0,
                   ),

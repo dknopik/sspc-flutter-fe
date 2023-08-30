@@ -182,7 +182,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            'Your balance',
+                                            myWallet.Address(),
                                             style: Style.normal,
                                           ),
                                           SizedBox(
@@ -196,7 +196,7 @@ class _AccountScreenState extends State<AccountScreen>
                                               text: TextSpan(
                                             children: [
                                               TextSpan(
-                                                text: totalBalance.toString(),
+                                                text: "Balance: " + totalBalance.toString(),
                                                 style: Style.title,
                                               ),
                                               TextSpan(
