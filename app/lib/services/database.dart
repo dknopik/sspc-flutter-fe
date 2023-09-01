@@ -4,13 +4,12 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/platform.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:web3dart/web3dart.dart';
-
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class ChannelDB {
 
@@ -23,8 +22,7 @@ class ChannelDB {
   }
 
   ChannelDB._internal() {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
+    dbSetup();
     initDB();
   }
 

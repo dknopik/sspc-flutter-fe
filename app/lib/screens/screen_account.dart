@@ -38,6 +38,7 @@ class _AccountScreenState extends State<AccountScreen>
   }
 
   Future<void> initLinks() async {
+    await MyWallet().initialization;
     final appLink = await appLinks.getInitialAppLink();
     if (appLink != null) {
       print('app link: $appLink');

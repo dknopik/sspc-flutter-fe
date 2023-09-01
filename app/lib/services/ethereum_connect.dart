@@ -1,9 +1,11 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:app/services/Channel.g.dart';
 import 'package:app/services/database.dart';
+import 'package:app/services/platform.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:math'; //used for the random number generator
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:web3dart/web3dart.dart';
@@ -49,15 +51,14 @@ class MyWallet {
     // Create (or open) wallet
     try {
       print(fullPath);
-      final content = File(fullPath).readAsStringSync();
-      wallet = Wallet.fromJson(content, password);
+      wallet = Wallet.fromJson(loadFile(fullPath), password);
       print("Successfully read wallet from file");
     } catch (e) {
       print("Wallet not found, creating new wallet.json");
       var rng = Random.secure();
       wallet = Wallet.createNew(EthPrivateKey.createRandom(rng), password, rng);
       // Write the wallet to disk
-      File(fullPath).writeAsString(wallet.toJson());
+      storeFile(fullPath, wallet.toJson());
       print(wallet.toJson());
     }
     // connect to RPC client
