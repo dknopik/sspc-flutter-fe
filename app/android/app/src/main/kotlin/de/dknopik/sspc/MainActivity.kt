@@ -1,4 +1,4 @@
-package com.example.app
+package de.dknopik.sspc
 
 import io.flutter.embedding.android.FlutterActivity
 
