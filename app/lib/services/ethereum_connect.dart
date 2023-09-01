@@ -13,7 +13,7 @@ import 'package:rlp/rlp.dart';
 
 const COOPERATIVE_CLOSE_ROUND = "ffffffffffffffffffffffffffffffff";
 const FILTER_OFFSET = 1000;
-  String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
+const CONTRACT_ADDR = "0xa23Cd49f677431f4eB23226b8c2150E24912070f";
 
 class MyWallet {
 
@@ -34,7 +34,6 @@ class MyWallet {
   String path = "wallet.json";
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
-  String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
   List<ChannelObj> channels = List.empty(growable: true);
   late Future<void> initialization;
 
@@ -63,7 +62,7 @@ class MyWallet {
     }
     // connect to RPC client
     client = Web3Client(rpc, Client());
-    EthereumAddress addr = EthereumAddress.fromHex(contractAddr);
+    EthereumAddress addr = EthereumAddress.fromHex(CONTRACT_ADDR);
     chainID = await client.getChainId();
     contract = Channel(address: addr, client: client, chainId: chainID.toInt());
   }
@@ -169,7 +168,7 @@ class ChannelObj {
   Wallet wallet;
   Web3Client client;
   Channel contract;
-  EthMetaData metadata = EthMetaData(id: Uint8List(32), us: EthereumAddress.fromHex(contractAddr) , other: EthereumAddress.fromHex(contractAddr), myBal: BigInt.zero, otherBal: BigInt.zero, isProposer: false, round: BigInt.zero);
+  EthMetaData metadata = EthMetaData(id: Uint8List(32), us: EthereumAddress.fromHex(CONTRACT_ADDR) , other: EthereumAddress.fromHex(CONTRACT_ADDR), myBal: BigInt.zero, otherBal: BigInt.zero, isProposer: false, round: BigInt.zero);
   List<StateUpdate> history = List.empty(growable: true);
 
   ChannelObj({

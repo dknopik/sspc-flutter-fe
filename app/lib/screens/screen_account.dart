@@ -211,7 +211,8 @@ class _AccountScreenState extends State<AccountScreen>
                                         children: [
                                           Text(
                                             MyWallet().Address(),
-                                            style: Style.normal,
+                                            style: Style.hidden,
+                                            textScaleFactor: 0.75,
                                           ),
                                           SizedBox(
                                             height: 15,
@@ -226,6 +227,7 @@ class _AccountScreenState extends State<AccountScreen>
                                               TextSpan(
                                                 text: "Balance: " + totalBalance.toString(),
                                                 style: Style.title,
+
                                               ),
                                               TextSpan(
                                                 text: ' wei',

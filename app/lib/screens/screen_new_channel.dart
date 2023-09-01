@@ -40,9 +40,9 @@ class _NewChannelState extends State<NewChannel> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            margin: const EdgeInsets.all(20.0),
+            margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
             padding: const EdgeInsets.all(10.0),
-            width: 130,
+            width: 110,
             height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -76,9 +76,9 @@ class _NewChannelState extends State<NewChannel> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.all(20.0),
+            margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
             padding: const EdgeInsets.all(10.0),
-            width: 130,
+            width: 110,
             height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -119,8 +119,8 @@ class _NewChannelState extends State<NewChannel> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.all(20.0),
-            width: 130,
+            margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            width: 110,
             height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
