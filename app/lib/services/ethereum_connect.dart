@@ -24,7 +24,7 @@ class MyWallet {
   }
 
   MyWallet._internal() {
-    init();
+    initialization = init();
   }
 
   late Wallet wallet;
@@ -36,6 +36,7 @@ class MyWallet {
   String rpc = "https://rpc.public.zkevm-test.net";
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
   List<ChannelObj> channels = List.empty(growable: true);
+  late Future<void> initialization;
 
   Future<void> init() async {
     // Correctly get the wallet path on all systems.
@@ -48,6 +49,7 @@ class MyWallet {
     }
     // Create (or open) wallet
     try {
+      print(fullPath);
       final content = File(fullPath).readAsStringSync();
       wallet = Wallet.fromJson(content, password);
       print("Successfully read wallet from file");
@@ -78,6 +80,7 @@ class MyWallet {
   }
 
   Future<BigInt> getTotalBalance() async {
+    await initialization;
     BigInt bal = await getOnChainBalance();
     for (final channel in channels) {
       bal += channel.metadata.myBal;
@@ -86,6 +89,7 @@ class MyWallet {
   }
 
   Future<BigInt> getOnChainBalance() async {
+    await initialization;
     try {
       EtherAmount balance = await client.getBalance(wallet.privateKey.address);
       print(balance.getInWei);

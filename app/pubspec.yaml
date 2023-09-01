@@ -42,6 +42,7 @@ dependencies:
   walletconnect_modal_flutter: ^2.1.6
   app_links: ^3.4.3
   path_provider: ^2.1.1
+  sqlite3_flutter_libs: ^0.5.16
 
 dev_dependencies:
   flutter_test:

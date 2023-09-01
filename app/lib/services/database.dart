@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -28,9 +30,16 @@ class ChannelDB {
 
   void initDB() async {
     WidgetsFlutterBinding.ensureInitialized();
-    String path = join(await getDatabasesPath(), 'channel.db');
-    print(path);
-    database = await openDatabase(path,
+    String fullPath;
+    const path = "channel.db";
+    try {
+      Directory appDocDirectory = await getApplicationDocumentsDirectory();
+      fullPath = "${appDocDirectory.path}/$path";
+    } catch(e) {
+      fullPath = path;
+    }
+    print(fullPath);
+    database = await openDatabase(fullPath,
       onCreate: (db, version) {
         return db.execute(
           'CREATE TABLE channels(id BLOB PRIMARY KEY, us TEXT, other TEXT, myBal TEXT, otherBal TEXT, isProposer BOOLEAN, round TEXT)',

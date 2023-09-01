@@ -6,6 +6,7 @@ import 'package:app/services/ethereum_connect.dart';
 import 'package:app/services/walletconnect.dart';
 
 void main(){
+  WidgetsFlutterBinding.ensureInitialized();
   MyWallet();
   ChannelDB();
   WalletConnect();
