@@ -1,6 +1,7 @@
 import 'package:app/services/Channel.g.dart';
 import 'package:app/services/database.dart';
 import 'package:http/http.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:math'; //used for the random number generator
 import 'dart:io';
 import 'dart:typed_data';
@@ -19,7 +20,7 @@ class MyWallet {
   late Web3Client client;
   late Channel contract;
   late BigInt chainID;
-  String path = "wallet.json";
+  String path = "/wallet.json";
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
@@ -27,8 +28,10 @@ class MyWallet {
 
   Future<void> init() async {
     // Create (or open) wallet
+    Directory appDocDirectory = await getApplicationDocumentsDirectory();
+    final fullPath = appDocDirectory.path + path;
     try {
-      String content = File(path).readAsStringSync();
+      String content = File(fullPath).readAsStringSync();
       wallet = Wallet.fromJson(content, password);
       print("Successfully read wallet from file");
     } catch (e) {
@@ -37,7 +40,7 @@ class MyWallet {
       var rng = Random.secure();
       EthPrivateKey random = EthPrivateKey.createRandom(rng);
       wallet = Wallet.createNew(random, password, rng);
-      File(path).writeAsString(wallet.toJson());
+      File(fullPath).writeAsString(wallet.toJson());
       print(wallet.toJson());
     }
     // connect to RPC client

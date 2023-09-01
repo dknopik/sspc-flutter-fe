@@ -15,39 +15,7 @@ class NFCNetwork {
     while(true) {
       List<NetworkMessage> messages = await read();
       for (final msg in messages) {
-        switch (msg.type) {
-          case 0: // Channel announcement
-            ChannelObj channel = wallet.createNewChannel();
-            // trigger modal
-            showMaterialModalBottomSheet(
-              expand: false,
-              context: context,
-              backgroundColor: Colors.transparent,
-              builder: (context) => ModalAcceptChannel(
-                channel: channel,
-                id: msg.id,
-                myBal: msg.otherBal, // turn around myBal and otherBal here
-                otherBal: msg.myBal,
-                other: msg.signature,
-              ),
-            );
-            break;
-          case 1: // Channel update
-            Uint8List id = msg.id;
-            wallet.channels.forEach(
-              (element) 
-              {if (element.metadata.id == id) {
-                element.receivedMoney(asStateUpdate(msg));
-              }});
-            break;
-          case 2: // Channel closing
-            Uint8List id = msg.id;
-            wallet.channels.forEach(
-              (element) 
-              {if (element.metadata.id == id) {
-                element.coopClose(asSignature(msg));
-              }});
-        }
+        handleIncomingMessage(msg, context, wallet);
       }
       sleep(Duration(seconds: 1));
     }
@@ -168,4 +136,40 @@ StateUpdate asStateUpdate(NetworkMessage msg) {
 
 Uint8List asSignature(NetworkMessage msg) {
   return msg.signature;
+}
+
+void handleIncomingMessage(NetworkMessage msg, BuildContext context, MyWallet wallet) {
+  switch (msg.type) {
+    case 0: // Channel announcement
+      ChannelObj channel = wallet.createNewChannel();
+      // trigger modal
+      showMaterialModalBottomSheet(
+        expand: false,
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => ModalAcceptChannel(
+          channel: channel,
+          id: msg.id,
+          myBal: msg.otherBal, // turn around myBal and otherBal here
+          otherBal: msg.myBal,
+          other: msg.signature,
+        ),
+      );
+      break;
+    case 1: // Channel update
+      Uint8List id = msg.id;
+      wallet.channels.forEach(
+              (element)
+          {if (element.metadata.id == id) {
+            element.receivedMoney(asStateUpdate(msg));
+          }});
+      break;
+    case 2: // Channel closing
+      Uint8List id = msg.id;
+      wallet.channels.forEach(
+              (element)
+          {if (element.metadata.id == id) {
+            element.coopClose(asSignature(msg));
+          }});
+  }
 }

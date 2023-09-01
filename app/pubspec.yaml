@@ -40,6 +40,8 @@ dependencies:
   sqflite_common_ffi: any
   walletconnect_flutter_v2: ^2.1.4
   walletconnect_modal_flutter: ^2.1.6
+  app_links: ^3.4.3
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:

@@ -1,14 +1,18 @@
+import 'dart:async';
+
 import 'package:app/components/default_sliver_app_bar_title.dart';
 import 'package:app/data/style.dart';
 import 'package:app/screens/screen_history_channels.dart';
 import 'package:app/screens/screen_new_channel.dart';
 import 'package:app/services/database.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/link.dart';
 import 'package:app/services/network.dart';
 import 'package:app/services/walletconnect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:walletconnect_modal_flutter/walletconnect_modal_flutter.dart';
+import 'package:app_links/app_links.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -20,6 +24,9 @@ class _AccountScreenState extends State<AccountScreen>
   final MyWallet myWallet = MyWallet();
   final NFCNetwork network = NFCNetwork();
 
+  final AppLinks appLinks = AppLinks();
+  StreamSubscription<Uri>? linkSubscription;
+
   BigInt onChainBalance = BigInt.from(0);
   BigInt totalBalance = BigInt.from(0);
 
@@ -30,6 +37,29 @@ class _AccountScreenState extends State<AccountScreen>
     myWallet.init();
     ChannelDB();
     WalletConnect();
+
+    initLinks();
+  }
+
+  Future<void> initLinks() async {
+    final appLink = await appLinks.getInitialAppLink();
+    if (appLink != null) {
+      print('app link: $appLink');
+      handleAppLink(appLink);
+    }
+
+    // Handle link when app is in warm state (front or background)
+    linkSubscription = appLinks.uriLinkStream.listen((appLink) {
+      print('late app link: $appLink');
+      handleAppLink(appLink);
+    });
+  }
+
+  void handleAppLink(Uri appLink) {
+    final msg = fromLink(appLink);
+    if (msg != null) {
+      handleIncomingMessage(msg, context, myWallet);
+    }
   }
 
   @override
