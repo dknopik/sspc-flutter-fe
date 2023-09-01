@@ -1,6 +1,7 @@
 import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:web3dart/web3dart.dart';
 
 class ModalAcceptChannel extends StatelessWidget {
   final ChannelObj channel;
@@ -32,10 +33,10 @@ class ModalAcceptChannel extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: InkWell(
                 onTap: () {
+                  print(other);
+                  EthereumAddress otherAddr = EthereumAddress(other);
+                  channel.accept(id, otherAddr, myBal, otherBal);
                   Navigator.pop(context);
-                  // todo network service
-                  // network service get
-                  // channel.accept(id, other, myBal, otherBal);
                 },
                 child: Container(
                   alignment: Alignment.center,

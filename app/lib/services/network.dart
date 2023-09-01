@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:app/screens/modal_accept_channel.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:ndef/ndef.dart' as ndef;
 
 class NFCNetwork {
@@ -77,7 +78,7 @@ class NetworkMessage {
   BigInt myBal;
   BigInt otherBal;
   BigInt round;
-  Uint8List signature;
+  Uint8List sigOrAddr;
   Uint8List id;
 
   NetworkMessage({
@@ -85,7 +86,7 @@ class NetworkMessage {
     required this.myBal,
     required this.otherBal,
     required this.round,
-    required this.signature,
+    required this.sigOrAddr,
     required this.id,
   });
 
@@ -95,8 +96,8 @@ class NetworkMessage {
       "myBal": myBal.toString(),
       "otherBal": otherBal.toString(),
       "round": round.toString(),
-      "signature": signature.toString(),
-      "id": id.toString(),
+      "signature": sigOrAddr.toHexString(),
+      "id": id.toHexString(),
     };
   }
 
@@ -106,23 +107,23 @@ class NetworkMessage {
       myBal: BigInt.parse(json["myBal"]),
       otherBal: BigInt.parse(json["otherBal"]),
       round: BigInt.parse(json["round"]),
-      signature: Uint8List.fromList(json["signature"].toString().codeUnits),
-      id: Uint8List.fromList(json["id"].toString().codeUnits),
+      sigOrAddr: hexToBytes(json["signature"]),
+      id: hexToBytes(json["id"]),
     );
     return networkMessage;
   }
 }
 
 NetworkMessage fromProposal(Uint8List id, BigInt myBal, BigInt otherBal, Uint8List address) {
-  return NetworkMessage(type: 0, myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: address, id: id);
+  return NetworkMessage(type: 0, myBal: myBal, otherBal: otherBal, round: BigInt.zero, sigOrAddr: address, id: id);
 }
 
 NetworkMessage fromStateUpdate(StateUpdate update) {
-  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, signature: update.signature, id: update.id);
+  return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, sigOrAddr: update.signature, id: update.id);
 }
 
 NetworkMessage fromSig(Uint8List signature) {
-  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: Uint8List(32));
+  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, sigOrAddr: signature, id: Uint8List(32));
 }
 
 StateUpdate asStateUpdate(NetworkMessage msg) {
@@ -131,11 +132,11 @@ StateUpdate asStateUpdate(NetworkMessage msg) {
     myBal: msg.myBal,
     otherBal: msg.otherBal,
     round: msg.round,
-    signature: msg.signature);
+    signature: msg.sigOrAddr);
 }
 
 Uint8List asSignature(NetworkMessage msg) {
-  return msg.signature;
+  return msg.sigOrAddr;
 }
 
 void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
@@ -152,7 +153,7 @@ void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
           id: msg.id,
           myBal: msg.otherBal, // turn around myBal and otherBal here
           otherBal: msg.myBal,
-          other: msg.signature,
+          other: msg.sigOrAddr,
         ),
       );
       break;

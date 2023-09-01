@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:web3dart/web3dart.dart';
 
 class ModalChannelOpen extends StatefulWidget {
   final NFCNetwork network;
@@ -210,7 +211,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   //todo Function Open Channel
                   Navigator.pop(context);
                   ChannelObj obj = MyWallet().createNewChannel();
-                  String other = _controllerO.text;
+                  EthereumAddress other = EthereumAddress.fromHex(_controllerO.text);
                   Uint8List id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
                   final msg = fromProposal(id, BigInt.from(a), BigInt.from(b), MyWallet().address());

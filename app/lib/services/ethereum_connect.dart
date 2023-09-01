@@ -187,9 +187,8 @@ class ChannelObj {
     return metadata;
   }
 
-  Future<Uint8List> open(String other, BigInt myBal, BigInt otherBal) async {
+  Future<Uint8List> open(EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
     Uint8List id = randomID();
-    EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx =
@@ -216,8 +215,7 @@ class ChannelObj {
     return id;
   }
 
-  void accept(Uint8List id, String other, BigInt myBal, BigInt otherBal) async {
-    EthereumAddress otherAddr = EthereumAddress.fromHex(other);
+  void accept(Uint8List id, EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx =
