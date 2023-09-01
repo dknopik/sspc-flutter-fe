@@ -5,8 +5,10 @@ import 'package:app/screens/screen_new_channel.dart';
 import 'package:app/services/database.dart';
 import 'package:app/services/ethereum_connect.dart';
 import 'package:app/services/network.dart';
+import 'package:app/services/walletconnect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:walletconnect_modal_flutter/walletconnect_modal_flutter.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -27,6 +29,7 @@ class _AccountScreenState extends State<AccountScreen>
     super.initState();
     myWallet.init();
     ChannelDB();
+    WalletConnect();
   }
 
   @override

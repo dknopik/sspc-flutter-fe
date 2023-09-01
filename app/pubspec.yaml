@@ -38,6 +38,8 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   sqflite_common_ffi: any
+  walletconnect_flutter_v2: ^2.1.4
+  walletconnect_modal_flutter: ^2.1.6
 
 dev_dependencies:
   flutter_test:

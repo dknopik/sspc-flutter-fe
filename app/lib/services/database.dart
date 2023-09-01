@@ -13,7 +13,6 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 class ChannelDB {
 
   late Database database;
-  bool init = false;
 
   static final ChannelDB _instance = ChannelDB._internal();
  
@@ -28,7 +27,6 @@ class ChannelDB {
   }
 
   void initDB() async {
-    init = true;
     WidgetsFlutterBinding.ensureInitialized();
     String path = join(await getDatabasesPath(), 'channel.db');
     print(path);
@@ -48,9 +46,8 @@ class ChannelDB {
 
   Future<List<EthMetaData>> getMetaData() async {
     final List<Map<String, dynamic>> maps = await database.query('channels');
-    
-    print("Reading from db");
-    print(maps.length);
+    int entries = maps.length;
+    print("Read $entries from database");
     return List.generate(maps.length, (i) {
       bool proposer = false;
       if (maps[i]['isProposer'] == 1) {
