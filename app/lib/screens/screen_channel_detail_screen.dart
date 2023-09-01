@@ -28,62 +28,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
   int a = 2;
   int b = 13;
 
-  List<ChannelTransaction> testData = [
-    ChannelTransaction(
-        prevA: 1,
-        prevB: 14,
-        newA: 2,
-        newB: 13,
-        signedByA: false,
-        signedByB: true,
-        init: false,
-        sending: false),
-    ChannelTransaction(
-        prevA: 1,
-        prevB: 14,
-        newA: 0,
-        newB: 15,
-        signedByA: true,
-        signedByB: false,
-        init: false,
-        sending: true),
-    ChannelTransaction(
-        prevA: 0,
-        prevB: 15,
-        newA: 1,
-        newB: 14,
-        signedByA: true,
-        signedByB: true,
-        init: false,
-        sending: false),
-    ChannelTransaction(
-        prevA: 0,
-        prevB: 15,
-        newA: 1,
-        newB: 14,
-        signedByA: false,
-        signedByB: true,
-        init: false,
-        sending: false),
-    ChannelTransaction(
-        prevA: 0,
-        prevB: 15,
-        newA: 0,
-        newB: 15,
-        signedByA: true,
-        signedByB: true,
-        init: true,
-        sending: false),
-    ChannelTransaction(
-        prevA: 0,
-        prevB: 15,
-        newA: 0,
-        newB: 15,
-        signedByA: true,
-        signedByB: false,
-        init: true,
-        sending: false),
-  ];
+  List<StateUpdate> state = MyWallet().channels[0].history;
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +195,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           children: [
                             SizedBox(),
                             Text(
-                              'opening state: You: 0 wei | They: 15 wei',
+                              'opening state: You: ${state.first.myBal} wei | They: ${state.first.otherBal} wei',
                               style: Style.hidden,
                             ),
                           ],
@@ -260,8 +205,8 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
               ),
 
               // !!!!!
-              // if (testData[0].signedByA &&
-              //     testData[0]
+              // if (state[0].signedByA &&
+              //     state[0]
               //         .signedByB) // last one settled, able to propose a new one
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -366,28 +311,28 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                   ),
                 ],
               ),
-
-              if (!testData[0].signedByA ||
-                  !testData[0]
+              /*
+              if (!state[0].signedByA ||
+                  !state[0]
                       .signedByB) // if either not signed, actions needed
                 Transaction(
                     head: Icon(
-                      testData[0].init
+                      state[0].init
                           ? CupertinoIcons.arrow_right_arrow_left
-                          : testData[0].sending
+                          : state[0].sending
                               ? CupertinoIcons.arrow_up
                               : CupertinoIcons.arrow_down,
                     ),
-                    title: !testData[0].init && testData[0].sending
-                        ? 'sending ${testData[0].prevA - testData[0].newA}'
-                        : !testData[0].init && !testData[0].sending
-                            ? 'receiving ${testData[0].newA - testData[0].prevA}'
+                    title: !state[0].init && state[0].sending
+                        ? 'sending ${state[0].prevA - state[0].newA}'
+                        : !state[0].init && !state[0].sending
+                            ? 'receiving ${state[0].newA - state[0].prevA}'
                             : ' ',
                     state:
-                        'You: ${testData[0].newA} wei | They: ${testData[0].newB} wei',
-                    actions: (testData[0].signedByA)
+                        'You: ${state[0].newA} wei | They: ${state[0].newB} wei',
+                    actions: (state[0].signedByA)
                         ? Text('waiting for confirmation')
-                        : (testData[0].signedByB)
+                        : (state[0].signedByB)
                             ? Row(
                                 children: [
                                   Container(
@@ -447,7 +392,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 
               // pending only has two state: waiting for comfirmation or waiting to sign
               // accept - go into history list; reject - start a different prop (old or new state) - pending from current side
-
+*/
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
@@ -462,40 +407,41 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
-                  itemCount: testData.length,
+                  itemCount: state.length,
                   itemBuilder: (context, i) {
+                    /*
                     return Transaction(
                       head: Icon(
-                        testData[i].init
+                        state[i].init
                             ? CupertinoIcons.arrow_right_arrow_left
-                            : testData[i].sending
+                            : state[i].sending
                                 ? CupertinoIcons.arrow_up
                                 : CupertinoIcons.arrow_down,
                       ),
-                      title: !testData[i].init && testData[i].sending
-                          ? 'sending ${testData[i].prevA - testData[i].newA}'
-                          : !testData[i].init && !testData[i].sending
-                              ? 'receiving ${testData[i].newA - testData[i].prevA}'
+                      title: !state[i].init && state[i].sending
+                          ? 'sending ${state[i].prevA - state[i].newA}'
+                          : !state[i].init && !state[i].sending
+                              ? 'receiving ${state[i].newA - state[i].prevA}'
                               : ' ',
                       state:
-                          'You: ${testData[i].newA} wei | They: ${testData[i].newB} wei',
+                          'You: ${state[i].newA} wei | They: ${state[i].newB} wei',
                       actions: Container(
                         width: 55,
                         child: Column(
                           children: [
                             Icon(
-                              testData[i].signedByA && !testData[i].signedByB
+                              state[i].signedByA && !state[i].signedByB
                                   ? CupertinoIcons.square_arrow_up
-                                  : !testData[i].signedByA &&
-                                          testData[i].signedByB
+                                  : !state[i].signedByA &&
+                                          state[i].signedByB
                                       ? CupertinoIcons.square_arrow_down
                                       : CupertinoIcons.check_mark,
                             ),
                             Text(
-                              testData[i].signedByA && !testData[i].signedByB
+                              state[i].signedByA && !state[i].signedByB
                                   ? 'propose'
-                                  : !testData[i].signedByA &&
-                                          testData[i].signedByB
+                                  : !state[i].signedByA &&
+                                          state[i].signedByB
                                       ? 'request'
                                       : 'settled',
                             )
@@ -503,6 +449,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         ),
                       ),
                     );
+                    */
                   },
                 ),
               ),
