@@ -9,14 +9,13 @@ final Codec<dynamic, String> linkEncoding = json.fuse(utf8.fuse(base64Url));
 NetworkMessage? fromLink(Uri uri) {
   if (uri.hasFragment) {
     try {
-      final fragmentJson = linkEncoding.decode(uri.fragment.substring(1));
-      return NetworkMessage.fromJson(json.decode(fragmentJson));
+      final fragmentJson = linkEncoding.decode(uri.fragment);
+      return NetworkMessage.fromJson(fragmentJson);
     } catch (e) {
       print(e);
       return null;
     }
   }
-  print("no fragment");
   return null;
 }
 

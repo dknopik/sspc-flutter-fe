@@ -95,19 +95,19 @@ class NetworkMessage {
       "myBal": myBal.toString(),
       "otherBal": otherBal.toString(),
       "round": round.toString(),
-      "signature": signature,
+      "signature": signature.toString(),
       "id": id.toString(),
     };
   }
 
   factory NetworkMessage.fromJson(Map<String, dynamic> json) {
     NetworkMessage networkMessage = NetworkMessage(
-      type: int.parse(json["type"]),
+      type: json["type"],
       myBal: BigInt.parse(json["myBal"]),
       otherBal: BigInt.parse(json["otherBal"]),
       round: BigInt.parse(json["round"]),
-      signature: json["signature"],
-      id: json["id"],
+      signature: Uint8List.fromList(json["signature"].toString().codeUnits),
+      id: Uint8List.fromList(json["id"].toString().codeUnits),
     );
     return networkMessage;
   }

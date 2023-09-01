@@ -112,7 +112,6 @@ class _NewChannelState extends State<NewChannel> {
                   print(result);
                   NetworkMessage? msg = fromLink(Uri.parse(result));
                   if (msg != null) {
-                    print("adsf");
                     handleIncomingMessage(msg, context);
                   }
                 }
