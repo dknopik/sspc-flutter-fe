@@ -20,26 +20,31 @@ class MyWallet {
   late Web3Client client;
   late Channel contract;
   late BigInt chainID;
-  String path = "/wallet.json";
+  String path = "wallet.json";
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
   List<ChannelObj> channels = List.empty(growable: true);
 
   Future<void> init() async {
-    // Create (or open) wallet
-    Directory appDocDirectory = await getApplicationDocumentsDirectory();
-    final fullPath = appDocDirectory.path + path;
+    // Correctly get the wallet path on all systems.
+    String fullPath = "";
     try {
-      String content = File(fullPath).readAsStringSync();
+      Directory appDocDirectory = await getApplicationDocumentsDirectory();
+      fullPath = appDocDirectory.path + "/" + path;
+    } catch(e) {
+      fullPath = path;
+    }
+    // Create (or open) wallet
+    try {
+      final content = File(fullPath).readAsStringSync();
       wallet = Wallet.fromJson(content, password);
       print("Successfully read wallet from file");
     } catch (e) {
-      print(e);
       print("Wallet not found, creating new wallet.json");
       var rng = Random.secure();
-      EthPrivateKey random = EthPrivateKey.createRandom(rng);
-      wallet = Wallet.createNew(random, password, rng);
+      wallet = Wallet.createNew(EthPrivateKey.createRandom(rng), password, rng);
+      // Write the wallet to disk
       File(fullPath).writeAsString(wallet.toJson());
       print(wallet.toJson());
     }
