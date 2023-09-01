@@ -31,7 +31,7 @@ class MyWallet {
     String fullPath = "";
     try {
       Directory appDocDirectory = await getApplicationDocumentsDirectory();
-      fullPath = appDocDirectory.path + "/" + path;
+      fullPath = "${appDocDirectory.path}/$path";
     } catch(e) {
       fullPath = path;
     }
