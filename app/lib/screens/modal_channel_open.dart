@@ -10,12 +10,10 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ModalChannelOpen extends StatefulWidget {
-  final MyWallet myWallet;
   final NFCNetwork network;
 
   const ModalChannelOpen({
     super.key,
-    required this.myWallet,
     required this.network
   });
 
@@ -210,11 +208,11 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                 onTap: () async {
                   //todo Function Open Channel
                   Navigator.pop(context);
-                  ChannelObj obj = widget.myWallet.createNewChannel();
+                  ChannelObj obj = MyWallet().createNewChannel();
                   String other = _controllerO.text;
                   Uint8List id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
-                  widget.network.send(List.from([fromProposal(id, BigInt.from(a), BigInt.from(b), widget.myWallet.address())]));
+                  widget.network.send(List.from([fromProposal(id, BigInt.from(a), BigInt.from(b), MyWallet().address())]));
                 },
                 child: Container(
                   alignment: Alignment.center,

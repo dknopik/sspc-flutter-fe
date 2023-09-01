@@ -11,11 +11,11 @@ import 'package:ndef/ndef.dart' as ndef;
 
 class NFCNetwork {
 
-  void startListener(BuildContext context, MyWallet wallet) async {
+  void startListener(BuildContext context) async {
     while(true) {
       List<NetworkMessage> messages = await read();
       for (final msg in messages) {
-        handleIncomingMessage(msg, context, wallet);
+        handleIncomingMessage(msg, context);
       }
       sleep(Duration(seconds: 1));
     }
@@ -138,10 +138,10 @@ Uint8List asSignature(NetworkMessage msg) {
   return msg.signature;
 }
 
-void handleIncomingMessage(NetworkMessage msg, BuildContext context, MyWallet wallet) {
+void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
   switch (msg.type) {
     case 0: // Channel announcement
-      ChannelObj channel = wallet.createNewChannel();
+      ChannelObj channel = MyWallet().createNewChannel();
       // trigger modal
       showMaterialModalBottomSheet(
         expand: false,
@@ -158,7 +158,7 @@ void handleIncomingMessage(NetworkMessage msg, BuildContext context, MyWallet wa
       break;
     case 1: // Channel update
       Uint8List id = msg.id;
-      wallet.channels.forEach(
+      MyWallet().channels.forEach(
               (element)
           {if (element.metadata.id == id) {
             element.receivedMoney(asStateUpdate(msg));
@@ -166,7 +166,7 @@ void handleIncomingMessage(NetworkMessage msg, BuildContext context, MyWallet wa
       break;
     case 2: // Channel closing
       Uint8List id = msg.id;
-      wallet.channels.forEach(
+      MyWallet().channels.forEach(
               (element)
           {if (element.metadata.id == id) {
             element.coopClose(asSignature(msg));

@@ -16,6 +16,17 @@ const FILTER_OFFSET = 1000;
   String contractAddr = "0x99653dE4788deCE3e919cDCf99A362C7115147B9";
 
 class MyWallet {
+
+  static final MyWallet _instance = MyWallet._internal();
+ 
+  factory MyWallet() {
+    return _instance;
+  }
+
+  MyWallet._internal() {
+    init();
+  }
+
   late Wallet wallet;
   late Web3Client client;
   late Channel contract;

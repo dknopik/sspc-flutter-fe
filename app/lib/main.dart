@@ -1,7 +1,14 @@
 import 'package:app/screens/screen_account.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'package:app/services/database.dart';
+import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/walletconnect.dart';
+
+void main(){
+  MyWallet();
+  ChannelDB();
+  WalletConnect();
   runApp(const MyApp());
 }
 

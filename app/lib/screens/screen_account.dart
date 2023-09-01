@@ -21,7 +21,6 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
-  final MyWallet myWallet = MyWallet();
   final NFCNetwork network = NFCNetwork();
 
   final AppLinks appLinks = AppLinks();
@@ -34,9 +33,6 @@ class _AccountScreenState extends State<AccountScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-    myWallet.init();
-    ChannelDB();
-    WalletConnect();
 
     initLinks();
   }
@@ -58,7 +54,7 @@ class _AccountScreenState extends State<AccountScreen>
   void handleAppLink(Uri appLink) {
     final msg = fromLink(appLink);
     if (msg != null) {
-      handleIncomingMessage(msg, context, myWallet);
+      handleIncomingMessage(msg, context);
     }
   }
 
@@ -67,15 +63,12 @@ class _AccountScreenState extends State<AccountScreen>
     super.didChangeDependencies();
 
     super.setState(() {}); // to update widget data
-    print("init");
-    await myWallet.init();
     // get onchain confirmed balance
     // get balance across all channels
-    print('get balance');
-    onChainBalance = await myWallet.getOnChainBalance();
-    totalBalance = await myWallet.getTotalBalance();
+    onChainBalance = await MyWallet().getOnChainBalance();
+    totalBalance = await MyWallet().getTotalBalance();
     print('started listener');
-    network.startListener(context, myWallet);
+    network.startListener(context);
     super.setState(() {}); // to update widget data
   }
 
@@ -90,7 +83,6 @@ class _AccountScreenState extends State<AccountScreen>
     final List<Widget> _tabScreens = [
       NewChannel(
         key: ValueKey(1),
-        myWallet: myWallet,
         nfcNetwork: network,
       ),
       HistoryChannels(
@@ -218,7 +210,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            myWallet.Address(),
+                                            MyWallet().Address(),
                                             style: Style.normal,
                                           ),
                                           SizedBox(

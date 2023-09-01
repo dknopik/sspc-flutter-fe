@@ -18,12 +18,10 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 class NewChannel extends StatefulWidget {
-  final MyWallet myWallet;
   final NFCNetwork nfcNetwork;
 
   const NewChannel({
     super.key,
-    required this.myWallet,
     required this.nfcNetwork,
   });
 
@@ -71,7 +69,6 @@ class _NewChannelState extends State<NewChannel> {
                 context: context,
                 backgroundColor: Colors.transparent,
                 builder: (context) => ModalChannelOpen(
-                  myWallet: widget.myWallet,
                   network: widget.nfcNetwork,
                 ),
               ),
@@ -108,11 +105,11 @@ class _NewChannelState extends State<NewChannel> {
                 backgroundColor: Colors.transparent,
                 builder: (context) => ModalQR(
                   builder: QrImageView(
-                    data: widget.myWallet.Address(),
+                    data: MyWallet().Address(),
                     version: QrVersions.auto,
                     size: 200.0,
                   ),
-                  data: widget.myWallet.Address(),
+                  data: MyWallet().Address(),
                 ),
               ),
             ),
@@ -124,9 +121,9 @@ class _NewChannelState extends State<NewChannel> {
         child: ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
-          itemCount: widget.myWallet.channels.length,
+          itemCount: MyWallet().channels.length,
           itemBuilder: (context, i) {
-            return _createChannel(widget.myWallet.channels[i], widget.nfcNetwork);
+            return _createChannel(MyWallet().channels[i], widget.nfcNetwork);
           },
         ),
       ),
