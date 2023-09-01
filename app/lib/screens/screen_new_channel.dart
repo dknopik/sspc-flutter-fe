@@ -112,6 +112,7 @@ class _NewChannelState extends State<NewChannel> {
                     version: QrVersions.auto,
                     size: 200.0,
                   ),
+                  data: widget.myWallet.Address(),
                 ),
               ),
             ),

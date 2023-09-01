@@ -97,7 +97,10 @@ class _ModalPQRScanState extends State<ModalPQRScan> {
                       height: 10,
                     ),
                     GestureDetector(
-                      child: Text('finished'),
+                      child: Container(
+                        color: Colors.lightBlue,
+                        child: Text('OK'),
+                      ),
                       onTap: () {
                         Navigator.pop(context,
                             result == null ? 'Failed' : result!.code ?? '');

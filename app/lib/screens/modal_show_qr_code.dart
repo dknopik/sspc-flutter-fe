@@ -5,10 +5,12 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class ModalQR extends StatefulWidget {
   final Widget builder;
+  final String data;
 
   const ModalQR({
     super.key,
     required this.builder,
+    required this.data,
   });
 
   @override
@@ -37,6 +39,14 @@ class _ModalQRState extends State<ModalQR> {
                 child: widget.builder,
               ),
             ),
+            Center(
+              child: GestureDetector(
+                child: Text(widget.data),
+                onTap: () async {
+                  await Clipboard.setData(ClipboardData(text: widget.data));
+                },
+              )
+            )
           ],
         ),
       ),

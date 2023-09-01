@@ -2,6 +2,7 @@ import 'package:app/components/default_sliver_app_bar_title.dart';
 import 'package:app/data/style.dart';
 import 'package:app/screens/screen_history_channels.dart';
 import 'package:app/screens/screen_new_channel.dart';
+import 'package:app/services/database.dart';
 import 'package:app/services/ethereum_connect.dart';
 import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +25,8 @@ class _AccountScreenState extends State<AccountScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
+    myWallet.init();
+    ChannelDB();
   }
 
   @override

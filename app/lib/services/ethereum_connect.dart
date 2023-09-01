@@ -1,4 +1,5 @@
 import 'package:app/services/Channel.g.dart';
+import 'package:app/services/database.dart';
 import 'package:http/http.dart';
 import 'dart:math'; //used for the random number generator
 import 'dart:io';
@@ -102,10 +103,26 @@ class EthMetaData {
 
   Uint8List encode() {
     if (isProposer) {
-      return Rlp.encode([us, other, myBal, otherBal, round]);
+      return Rlp.encode([us.addressBytes, other.addressBytes, myBal, otherBal, round]);
     } else {
-      return Rlp.encode([other, us, otherBal, myBal, round]);
+      return Rlp.encode([other.addressBytes, us.addressBytes, otherBal, myBal, round]);
     }
+  }
+
+  Map<String, dynamic> toMap() {
+    int proposer = 0;
+    if (isProposer) {
+      proposer = 1;
+    }
+    return {
+      'id': id,
+      'us': us.hexEip55,
+      'other': other.hexEip55,
+      'myBal': myBal.toString(),
+      'otherBal': otherBal.toString(),
+      'isProposer': proposer,
+      'round': round.toString(),
+    };
   }
 }
 
@@ -165,6 +182,7 @@ class ChannelObj {
         otherBal: otherBal,
         isProposer: true,
         round: BigInt.zero);
+    ChannelDB().insertMetaData(metadata);
     // Update History
     history.add(StateUpdate(
         id: id,
@@ -183,7 +201,7 @@ class ChannelObj {
         Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
     String res = await contract.accept(id,
         credentials: wallet.privateKey, transaction: tx);
-    // Update Metadata
+    // Insert Metadata
     metadata = EthMetaData(
         id: id,
         us: myAddr,
@@ -192,6 +210,7 @@ class ChannelObj {
         otherBal: otherBal,
         isProposer: false,
         round: BigInt.zero);
+    ChannelDB().insertMetaData(metadata);
     // Update History
     history.add(StateUpdate(
         id: id,
@@ -221,6 +240,7 @@ class ChannelObj {
         credentials: wallet.privateKey);
     // update metadata
     metadata.round = BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
+    ChannelDB().updateMetaData(metadata);  
   }
 
   StateUpdate sendMoney(BigInt value) {
@@ -236,6 +256,7 @@ class ChannelObj {
     _updateBalances(newMyBal, newOtherBal);
     Uint8List sig =
         wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+     ChannelDB().updateMetaData(metadata);
     // Update History
     StateUpdate update = StateUpdate(
         id: metadata.id,
@@ -285,6 +306,7 @@ class ChannelObj {
       throw const FormatException("invalid parameter, invalid signature");
     }
     // Update state
+    ChannelDB().updateMetaData(metadata);
     history.add(update);
     _updateBalances(update.myBal, update.otherBal);
   }
