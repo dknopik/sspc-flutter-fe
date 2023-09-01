@@ -12,9 +12,11 @@ NetworkMessage? fromLink(Uri uri) {
       final fragmentJson = linkEncoding.decode(uri.fragment.substring(1));
       return NetworkMessage.fromJson(json.decode(fragmentJson));
     } catch (e) {
+      print(e);
       return null;
     }
   }
+  print("no fragment");
   return null;
 }
 

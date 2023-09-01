@@ -1,21 +1,22 @@
 import 'dart:async';
 
 import 'package:app/data/style.dart';
-import 'package:app/screens/modal_accept_channel.dart';
 import 'package:app/screens/modal_channel_open.dart';
 import 'package:app/screens/modal_close.dart';
+import 'package:app/screens/modal_qr_scan.dart';
+import 'package:app/screens/modal_read_message.dart';
 import 'package:app/screens/modal_reject_channel.dart';
 import 'package:app/screens/modal_show_qr_code.dart';
 import 'package:app/screens/screen_channel_detail_screen.dart';
 import 'package:app/services/ethereum_connect.dart';
 import 'package:app/services/network.dart';
+import 'package:app/services/link.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
 
 class NewChannel extends StatefulWidget {
   final NFCNetwork nfcNetwork;
@@ -76,6 +77,7 @@ class _NewChannelState extends State<NewChannel> {
           ),
           Container(
             margin: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(10.0),
             width: 130,
             height: 100,
             decoration: BoxDecoration(
@@ -93,7 +95,50 @@ class _NewChannelState extends State<NewChannel> {
                   SizedBox(height: 10),
                   SizedBox(
                     child: Text(
-                      'QR Code',
+                      'Scan message',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+              onTap: () async {
+                String? result = await showMaterialModalBottomSheet(
+                  expand: false,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => ModalReadMessage()
+                );
+                if (result != null) {
+                  print(result);
+                  NetworkMessage? msg = fromLink(Uri.parse(result));
+                  if (msg != null) {
+                    print("adsf");
+                    handleIncomingMessage(msg, context);
+                  }
+                }
+              }
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            width: 130,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Style.background,
+            ),
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.plus_circled,
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    child: Text(
+                      'My Wallet',
                       textAlign: TextAlign.center,
                     ),
                   )

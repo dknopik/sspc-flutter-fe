@@ -16,14 +16,14 @@ class ModalPQRScan extends StatefulWidget {
 }
 
 class _ModalPQRScanState extends State<ModalPQRScan> {
-  Barcode? result;
+  String? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   void _onQRViewCreated(QRViewController controller) {
     setState(() => this.controller = controller);
     controller.scannedDataStream.listen((scanData) {
-      setState(() => result = scanData);
+      setState(() => result = scanData.code);
     });
   }
 
@@ -40,7 +40,7 @@ class _ModalPQRScanState extends State<ModalPQRScan> {
   void readQr() async {
     if (result != null) {
       controller!.pauseCamera();
-      print(result!.code);
+      print(result!);
       controller!.dispose();
     }
   }
@@ -90,9 +90,10 @@ class _ModalPQRScanState extends State<ModalPQRScan> {
                       height: 20,
                     ),
                     if (result != null)
-                      Text('Data: ${result!.code}')
+                      Text('Message: ${result!}')
                     else
-                      const Text('Scan a code'),
+                      const Text('Scan a message'),
+                    
                     SizedBox(
                       height: 10,
                     ),
@@ -102,8 +103,7 @@ class _ModalPQRScanState extends State<ModalPQRScan> {
                         child: Text('OK'),
                       ),
                       onTap: () {
-                        Navigator.pop(context,
-                            result == null ? 'Failed' : result!.code ?? '');
+                        Navigator.pop(context, result);
                       },
                     )
                   ],

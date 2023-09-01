@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/screens/modal_qr_scan.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/link.dart';
 import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -212,7 +213,9 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   String other = _controllerO.text;
                   Uint8List id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
-                  widget.network.send(List.from([fromProposal(id, BigInt.from(a), BigInt.from(b), MyWallet().address())]));
+                  final msg = fromProposal(id, BigInt.from(a), BigInt.from(b), MyWallet().address());
+                  widget.network.send(List.from([msg]));
+                  print(toLink(msg));
                 },
                 child: Container(
                   alignment: Alignment.center,
