@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 class ModalAcceptChannel extends StatelessWidget {
   final ChannelObj channel;
-  final BigInt id;
+  final Uint8List id;
   final BigInt otherBal;
   final BigInt myBal;
   final Uint8List other;

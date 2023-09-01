@@ -82,7 +82,7 @@ class MyWallet {
 }
 
 class EthMetaData {
-  BigInt id;
+  Uint8List id;
   EthereumAddress us;
   EthereumAddress other;
   BigInt myBal;
@@ -110,7 +110,7 @@ class EthMetaData {
 }
 
 class StateUpdate {
-  BigInt id;
+  Uint8List id;
   BigInt myBal;
   BigInt otherBal;
   BigInt round;
@@ -129,7 +129,7 @@ class ChannelObj {
   Wallet wallet;
   Web3Client client;
   Channel contract;
-  EthMetaData metadata = EthMetaData(id: BigInt.zero, us: EthereumAddress.fromHex(contractAddr) , other: EthereumAddress.fromHex(contractAddr), myBal: BigInt.zero, otherBal: BigInt.zero, isProposer: false, round: BigInt.zero);
+  EthMetaData metadata = EthMetaData(id: Uint8List(32), us: EthereumAddress.fromHex(contractAddr) , other: EthereumAddress.fromHex(contractAddr), myBal: BigInt.zero, otherBal: BigInt.zero, isProposer: false, round: BigInt.zero);
   List<StateUpdate> history = List.empty(growable: true);
 
   ChannelObj({
@@ -147,8 +147,8 @@ class ChannelObj {
     return metadata;
   }
 
-  Future<BigInt> open(String other, BigInt myBal, BigInt otherBal) async {
-    BigInt id = randomBigInt();
+  Future<Uint8List> open(String other, BigInt myBal, BigInt otherBal) async {
+    Uint8List id = randomID();
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
@@ -175,7 +175,7 @@ class ChannelObj {
     return id;
   }
 
-  void accept(BigInt id, String other, BigInt myBal, BigInt otherBal) async {
+  void accept(Uint8List id, String other, BigInt myBal, BigInt otherBal) async {
     EthereumAddress otherAddr = EthereumAddress.fromHex(other);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
@@ -216,7 +216,7 @@ class ChannelObj {
       valueA = metadata.otherBal;
       valueB = metadata.myBal;
     }
-    String res = await contract.cooperative_close(
+    String res = await contract.cooperativeClose(
         metadata.id, valueA, valueB, sig,
         credentials: wallet.privateKey);
     // update metadata
@@ -335,12 +335,12 @@ class ChannelObj {
   }
 }
 
-BigInt randomBigInt() {
+Uint8List randomID() {
   const size = 32;
   final random = Random.secure();
-  BigInt result = BigInt.zero;
+  Uint8List result = Uint8List(size);
   for (var i = 0; i < size; i++) {
-    result |= BigInt.from(random.nextInt(256)) << (8 * i);
+    result[i] = random.nextInt(256);
   }
   return result;
 }

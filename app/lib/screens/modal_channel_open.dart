@@ -212,7 +212,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
                   Navigator.pop(context);
                   ChannelObj obj = widget.myWallet.createNewChannel();
                   String other = _controllerO.text;
-                  BigInt id =
+                  Uint8List id =
                       await obj.open(other, BigInt.from(a), BigInt.from(b));
                   widget.network.send(List.from([fromProposal(id, BigInt.from(a), BigInt.from(b), widget.myWallet.address())]));
                 },

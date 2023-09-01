@@ -33,7 +33,7 @@ class NFCNetwork {
             );
             break;
           case 1: // Channel update
-            BigInt id = msg.id;
+            Uint8List id = msg.id;
             wallet.channels.forEach(
               (element) 
               {if (element.metadata.id == id) {
@@ -41,7 +41,7 @@ class NFCNetwork {
               }});
             break;
           case 2: // Channel closing
-            BigInt id = msg.id;
+            Uint8List id = msg.id;
             wallet.channels.forEach(
               (element) 
               {if (element.metadata.id == id) {
@@ -110,7 +110,7 @@ class NetworkMessage {
   BigInt otherBal;
   BigInt round;
   Uint8List signature;
-  BigInt id;
+  Uint8List id;
 
   NetworkMessage({
     required this.type,
@@ -139,13 +139,13 @@ class NetworkMessage {
       otherBal: BigInt.parse(json["otherBal"]),
       round: BigInt.parse(json["round"]),
       signature: json["signature"],
-      id: BigInt.parse(json["id"]),
+      id: json["id"],
     );
     return networkMessage;
   }
 }
 
-NetworkMessage fromProposal(BigInt id, BigInt myBal, BigInt otherBal, Uint8List address) {
+NetworkMessage fromProposal(Uint8List id, BigInt myBal, BigInt otherBal, Uint8List address) {
   return NetworkMessage(type: 0, myBal: myBal, otherBal: otherBal, round: BigInt.zero, signature: address, id: id);
 }
 
@@ -154,7 +154,7 @@ NetworkMessage fromStateUpdate(StateUpdate update) {
 }
 
 NetworkMessage fromSig(Uint8List signature) {
-  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: BigInt.zero);
+  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, signature: signature, id: Uint8List(32));
 }
 
 StateUpdate asStateUpdate(NetworkMessage msg) {
