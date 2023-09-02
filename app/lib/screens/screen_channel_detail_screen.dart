@@ -190,7 +190,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           children: [
                             SizedBox(),
                             Text(
-                              'opening state: You: ${formatValue(state.first.myBal)} | They: ${formatValue(state.first.otherBal)} wei',
+                              'opening state: You: ${formatValue(state.first.myBal)} | They: ${formatValue(state.first.otherBal)}',
                               style: Style.hidden,
                             ),
                           ],
