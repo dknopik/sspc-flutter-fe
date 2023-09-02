@@ -213,11 +213,12 @@ class ChannelObj {
 
   Future<Uint8List> open(EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
     Uint8List id = randomID();
+    print(id);
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx =
         Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
-    String res = await contract.open(id, myAddr, myBal, otherBal,
+    String res = await contract.open(id, otherAddr, myBal, otherBal,
         credentials: wallet.privateKey, transaction: tx);
     // Update Metadata
     metadata = EthMetaData(
@@ -240,7 +241,7 @@ class ChannelObj {
     return id;
   }
 
-  void accept(Uint8List id, EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
+  Future<void> accept(Uint8List id, EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx =
@@ -333,6 +334,7 @@ class ChannelObj {
     if (update.round != metadata.round + BigInt.one) {
       throw const FormatException("invalid parameter, round not consecutive");
     }
+    print("highway");
     // verify sig
     bool otherProposer = !metadata.isProposer;
     EthMetaData toTest = EthMetaData(
@@ -353,11 +355,13 @@ class ChannelObj {
     if (publicKeyToAddress(pk) != metadata.other.addressBytes) {
       throw const FormatException("invalid parameter, invalid signature");
     }
+    print("to");
     // Update state
     ChannelDB().updateMetaData(metadata);
     update.sender = PEER_SEND;
     addUpdate(update);
     _updateBalances(update.myBal, update.otherBal);
+    print("hell");
   }
 
   // Event filtering

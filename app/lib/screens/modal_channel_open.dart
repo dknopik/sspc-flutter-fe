@@ -212,15 +212,17 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
               padding: const EdgeInsets.all(16),
               child: InkWell(
                 onTap: () async {
+                  print("TAP");
                   //todo Function Open Channel
                   ChannelObj obj = MyWallet().createNewChannel();
                   EthereumAddress other = EthereumAddress.fromHex(_controllerO.text);
+                  final tx = obj.open(other, BigInt.from(a), BigInt.from(b));
                   await showMaterialModalBottomSheet(
                     isDismissible: false,
                     expand: false,
                     context: context,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => ModalPendingTx(tx: obj.open(other, BigInt.from(a), BigInt.from(b))),
+                    builder: (context) => ModalPendingTx(tx: tx),
                   ).then((value) async {
                     if (value != null) {
                       final msg = fromProposal(value, BigInt.from(a), BigInt.from(b),

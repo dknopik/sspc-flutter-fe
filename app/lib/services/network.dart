@@ -158,10 +158,16 @@ void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
       break;
     case 1: // Channel update
       Uint8List id = msg.id;
+      print("on");
       MyWallet().channels.forEach(
               (element)
           {if (element.metadata.id == id) {
-            element.receivedMoney(asStateUpdate(msg));
+            try {
+              print("a");
+              element.receivedMoney(asStateUpdate(msg));
+            } catch (e) {
+              print(e);
+            }
           }});
       break;
     case 2: // Channel closing

@@ -47,6 +47,15 @@ dependencies:
   rational: ^2.2.2
   decimal: ^2.3.3
   intl: ^0.18.1
+  web3dart: ^2.3.5
+  rlp: ^2.0.0
+  web3dart_builders: ^0.0.7
+  build_runner: ^2.0.0
+  modal_bottom_sheet: 3.0.0-pre
+  flutter_keyboard_visibility: ^5.0.3
+  flutter_nfc_kit: ^3.3.1
+  qr_flutter: ^4.1.0
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -58,15 +67,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  web3dart: ^2.3.5
-  rlp: ^2.0.0
-  web3dart_builders: ^0.0.7
-  build_runner: ^2.0.0
-  modal_bottom_sheet: 3.0.0-pre
-  flutter_keyboard_visibility: ^5.0.3
-  flutter_nfc_kit: ^3.3.1
-  qr_flutter: ^4.1.0
-  qr_code_scanner: ^1.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

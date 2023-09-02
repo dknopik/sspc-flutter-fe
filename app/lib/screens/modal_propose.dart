@@ -3,6 +3,11 @@ import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+import '../services/link.dart';
+import 'modal_show_qr_code.dart';
 
 class ModalPropose extends StatefulWidget {
   final bool sending;
@@ -171,12 +176,24 @@ class _ModalProposeState extends State<ModalPropose> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: InkWell(
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  if (widget.sending) {
-                    StateUpdate update = widget.channel.sendMoney(money);
-                    widget.network.send(List.from([fromStateUpdate(update)]));
-                  }
+                  String link = toLink(fromStateUpdate(widget.channel.sendMoney(money)));
+                  await showMaterialModalBottomSheet(
+                    expand: false,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => ModalQR(
+                      builder: QrImageView(
+                        data: link,
+                        version: QrVersions.auto,
+                        size: 200.0,
+                      ),
+                      data: link,
+                    )
+                  ).then((value) {
+                    Navigator.pop(context);
+                  });
                 },
                 child: Container(
                   alignment: Alignment.center,

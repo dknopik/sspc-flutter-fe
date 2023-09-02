@@ -26,13 +26,6 @@ class ChannelDetailScreen extends StatefulWidget {
 }
 
 class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
-  List<StateUpdate> state = MyWallet().channels[0].history;
-
-  void update() {
-    setState(() {
-      state = MyWallet().channels[0].history;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,15 +48,6 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                   height: 1.1,
                 ),
               ),
-              TextSpan(
-                text: ' with Daniel',
-                style: TextStyle(
-                  color: Color(0xFF565559),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                  height: 1.1,
-                ),
-              )
             ],
           )),
         ),
@@ -128,7 +112,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                         text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: formatValue(state.last.myBal),
+                                          text: formatValue(widget.channel.history.last.myBal),
                                           style: Style.title,
                                         ),
                                       ],
@@ -148,7 +132,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Text(
-                                      formatValue(state.last.otherBal),
+                                      formatValue(widget.channel.history.last.otherBal),
                                       style: TextStyle(
                                         color: Color(0xFF565559),
                                         fontSize: 14,
@@ -190,7 +174,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           children: [
                             SizedBox(),
                             Text(
-                              'opening state: You: ${formatValue(state.first.myBal)} | They: ${formatValue(state.first.otherBal)}',
+                              'opening state: You: ${formatValue(widget.channel.history.first.myBal)} | They: ${formatValue(widget.channel.history.first.otherBal)}',
                               style: Style.hidden,
                             ),
                           ],
@@ -233,12 +217,12 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                             backgroundColor: Colors.transparent,
                             builder: (context) => ModalPropose(
                                 sending: true,
-                                prevA: state.last.myBal,
-                                prevB: state.last.otherBal,
+                                prevA: widget.channel.history.last.myBal,
+                                prevB: widget.channel.history.last.otherBal,
                                 channel: widget.channel,
                                 network: widget.network),
                           ),
-                          update()
+                          //update()
                       }
                     ),
                   ),
@@ -331,17 +315,16 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     reverse: true,
-                    itemCount: state.length,
+                    itemCount: widget.channel.history.length,
                     itemBuilder: (context, i) {
                       if (i == 0) {
-                        return Transaction(update: state[i], prevUpdate: null);
+                        return Transaction(update: widget.channel.history[i], prevUpdate: null);
                       } else {
-                        return Transaction(update: state[i], prevUpdate: state[i-1]);
+                        return Transaction(update: widget.channel.history[i], prevUpdate: widget.channel.history[i-1]);
                       }
                     },
                   ),
                 )
-                  
               ),
 
               // receiver side: accept with signature; deny (what happens? send old transaction back?)

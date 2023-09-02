@@ -2,6 +2,9 @@ import 'package:app/services/ethereum_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import 'modal_pending_tx.dart';
 
 class ModalAcceptChannel extends StatelessWidget {
   final Uint8List id;
@@ -32,12 +35,20 @@ class ModalAcceptChannel extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: InkWell(
-                onTap: () {
+                onTap: () async {
                   print(other);
                   ChannelObj channel = MyWallet().createNewChannel();
                   EthereumAddress otherAddr = EthereumAddress(other);
-                  channel.accept(id, otherAddr, myBal, otherBal);
-                  Navigator.pop(context);
+                  final tx = channel.accept(id, otherAddr, myBal, otherBal);
+                  await showMaterialModalBottomSheet(
+                    isDismissible: false,
+                    expand: false,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => ModalPendingTx(tx: tx),
+                  ).then((value) {
+                    Navigator.pop(context);
+                  });
                 },
                 child: Container(
                   alignment: Alignment.center,

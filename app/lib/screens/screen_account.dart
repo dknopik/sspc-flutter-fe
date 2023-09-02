@@ -73,7 +73,7 @@ class _AccountScreenState extends State<AccountScreen>
     print('started listener');
     network.startListener(context);
 
-    ChannelDB().getChannels(MyWallet()); // Read old channels from db
+    await ChannelDB().getChannels(MyWallet()); // Read old channels from db
     super.setState(() {}); // to update widget data
   }
 
