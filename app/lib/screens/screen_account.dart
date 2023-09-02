@@ -72,6 +72,8 @@ class _AccountScreenState extends State<AccountScreen>
     totalBalance = await MyWallet().getTotalBalance();
     print('started listener');
     network.startListener(context);
+
+    ChannelDB().getChannels(MyWallet()); // Read old channels from db
     super.setState(() {}); // to update widget data
   }
 

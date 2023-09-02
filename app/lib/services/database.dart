@@ -38,9 +38,10 @@ class ChannelDB {
     }
     print(fullPath);
     database = await openDatabase(fullPath,
-      onCreate: (db, version) {
+      onCreate: (db, version) async {
+        await db.execute("CREATE TABLE updates(id INTEGER PRIMARY KEY AUTOINCREMENT, channelID BLOB, myBal TEXT, otherBal TEXT, round TEXT, sender BOOLEAN, signature BLOB)");
         return db.execute(
-          'CREATE TABLE channels(id BLOB PRIMARY KEY, us TEXT, other TEXT, myBal TEXT, otherBal TEXT, isProposer BOOLEAN, round TEXT)',
+          "CREATE TABLE channels(id BLOB PRIMARY KEY, us TEXT, other TEXT, myBal TEXT, otherBal TEXT, isProposer BOOLEAN, round TEXT)"
         );
       },
       version: 1,
@@ -80,6 +81,49 @@ class ChannelDB {
       where: 'id = ?',
       whereArgs: [data.id],
     );
+  }
+  
+  Future<void> insertStateUpdate(StateUpdate update) async {
+    await database.insert('updates', update.toMap(), conflictAlgorithm: ConflictAlgorithm.fail);
+  }
+
+  Future<List<ChannelObj>> getChannels(MyWallet wallet) async {
+    final list = List<ChannelObj>.empty(growable: true);
+    final metaDataList = await getMetaData();
+    for (final metadata in metaDataList) {
+      // Only update unknown channels
+      if (wallet.channels.any((element) => element.metadata.id == metadata.id)) {
+        continue;
+      }
+
+      final updates = await getStateUpdatesByID(metadata.id);
+
+      ChannelObj obj = wallet.createNewChannel();
+      obj.metadata = metadata;
+      obj.history = updates;
+    }
+    return list;
+  }
+
+  Future<List<StateUpdate>> getStateUpdatesByID(Uint8List id) async {
+    final List<Map<String, dynamic>> maps = await database.query('updates', where: 'channelID = ?', whereArgs: [id]);
+    int entries = maps.length;
+    print("Read $entries from state update database");
+    return List.generate(maps.length, (i) {
+      bool sender = false;
+      if (maps[i]['sender'] == 1) {
+        sender = true;
+      }
+
+      return StateUpdate(
+        id: maps[i]['channelID'],
+        myBal: BigInt.parse(maps[i]['myBal']),
+        otherBal: BigInt.parse(maps[i]['otherBal']),
+        sender: sender,
+        round: BigInt.parse(maps[i]['round']),
+        signature: maps[i]['signature'],
+      );
+    });
   }
 }
 

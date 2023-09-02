@@ -167,6 +167,21 @@ class StateUpdate {
     required this.sender,
     required this.signature,
   });
+
+  Map<String, dynamic> toMap() {
+    int senderInt = 0;
+    if (sender) {
+      senderInt = 1;
+    }
+    return {
+      'channelID': id,
+      'myBal': myBal.toString(),
+      'otherBal': otherBal.toString(),
+      'sender': senderInt,
+      'round': round.toString(),
+      'signature': signature,
+    };
+  }
 }
 
 class ChannelObj {
@@ -191,6 +206,11 @@ class ChannelObj {
     return metadata;
   }
 
+  void addUpdate(StateUpdate update) {
+    history.add(update);
+    ChannelDB().insertStateUpdate(update);
+  }
+
   Future<Uint8List> open(EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
     Uint8List id = randomID();
     EthereumAddress myAddr = wallet.privateKey.address;
@@ -210,7 +230,7 @@ class ChannelObj {
         round: BigInt.zero);
     ChannelDB().insertMetaData(metadata);
     // Update History
-    history.add(StateUpdate(
+    addUpdate(StateUpdate(
         id: id,
         myBal: myBal,
         otherBal: otherBal,
@@ -238,13 +258,13 @@ class ChannelObj {
         round: BigInt.zero);
     ChannelDB().insertMetaData(metadata);
     // Update History
-    history.add(StateUpdate(
-        id: id,
-        myBal: myBal,
-        otherBal: otherBal,
-        round: BigInt.zero,
-        sender: PEER_SEND,
-        signature: Uint8List(0)));
+    addUpdate(StateUpdate(
+      id: id,
+      myBal: myBal,
+      otherBal: otherBal,
+      round: BigInt.zero,
+      sender: PEER_SEND,
+      signature: Uint8List(0)));
   }
 
   Uint8List createCoopClose() {
@@ -292,7 +312,7 @@ class ChannelObj {
         round: metadata.round,
         sender: WE_SEND,
         signature: sig);
-    history.add(update);
+    addUpdate(update);
     return update;
   }
 
@@ -336,7 +356,7 @@ class ChannelObj {
     // Update state
     ChannelDB().updateMetaData(metadata);
     update.sender = PEER_SEND;
-    history.add(update);
+    addUpdate(update);
     _updateBalances(update.myBal, update.otherBal);
   }
 
