@@ -359,7 +359,6 @@ class ChannelObj {
     BigInt newOtherBal = metadata.otherBal + value;
     metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
-    print(metadata.toMap());
     Uint8List sig =
         wallet.privateKey.signToUint8List(metadata.encode());
     ChannelDB().updateMetaData(metadata);
@@ -392,7 +391,6 @@ class ChannelObj {
     if (update.round != metadata.round + BigInt.one) {
       throw const FormatException("invalid parameter, round not consecutive");
     }
-    print("highway");
     // verify sig
     bool otherProposer = !metadata.isProposer;
     EthMetaData toTest = EthMetaData(
@@ -405,7 +403,6 @@ class ChannelObj {
         round: metadata.round + BigInt.one);
     // implicitly makes sure that the peer only signed round + 1
 
-    print(toTest.toMap());
     Uint8List hash = keccak256(toTest.encode());
     Uint8List pk = ecRecover(
         hash,
@@ -414,14 +411,12 @@ class ChannelObj {
     if (!listEquals(publicKeyToAddress(pk), metadata.other.addressBytes)) {
       throw const FormatException("invalid parameter, invalid signature");
     }
-    print("to");
     // Update state
     update.sender = PEER_SEND;
     addUpdate(update);
     _updateBalances(update.myBal, update.otherBal);
     metadata.round = metadata.round + BigInt.one;
     ChannelDB().updateMetaData(metadata);
-    print("hell");
   }
 
   Future<void> dispute() async {

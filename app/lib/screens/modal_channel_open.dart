@@ -212,7 +212,6 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
               padding: const EdgeInsets.all(16),
               child: InkWell(
                 onTap: () async {
-                  print("TAP");
                   //todo Function Open Channel
                   ChannelObj obj = MyWallet().createNewChannel();
                   EthereumAddress other = EthereumAddress.fromHex(_controllerO.text);

@@ -19,11 +19,8 @@ class _ModalPendingTxState<T> extends State<ModalPendingTx<T>> {
   void initState() {
     super.initState();
     widget.tx.then((value) {
-      print("yay");
-      print(value);
       Navigator.of(context).pop(value);
     }, onError: (error) {
-      print("aww");
       print(error);
       Navigator.of(context).pop(null);
     });
