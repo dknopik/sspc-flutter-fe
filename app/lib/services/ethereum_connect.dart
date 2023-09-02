@@ -13,6 +13,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:rlp/rlp.dart';
+import 'package:web_socket_channel/io.dart';
 
 const COOPERATIVE_CLOSE_ROUND = "ffffffffffffffffffffffffffffffff";
 const FILTER_OFFSET = 1000;
@@ -39,6 +40,7 @@ class MyWallet {
   String path = "wallet.json";
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
+  String ws = "ws://rpc.public.zkevm-test.net";
   List<ChannelObj> channels = List.empty(growable: true);
   late Future<void> initialization;
 
@@ -65,7 +67,9 @@ class MyWallet {
       print(wallet.toJson());
     }
     // connect to RPC client
-    client = Web3Client(rpc, Client());
+    client = Web3Client(rpc, Client(), socketConnector:  () {
+      return IOWebSocketChannel.connect(ws).cast<String>();
+    });
     EthereumAddress addr = EthereumAddress.fromHex(CONTRACT_ADDR);
     chainID = await client.getChainId();
     contract = Channel(address: addr, client: client, chainId: chainID.toInt());
@@ -107,20 +111,21 @@ class MyWallet {
     return wallet.privateKey.address.addressBytes;
   }
 
-  void setupDisputeWatcher() async {
-    while (true) {
-      Stream<Closing> stream = await waitForClosingEvent();
-      await for (Closing event in stream) {
-        for (ChannelObj chan in channels) { 
-          // TODO this could be done a bit better, but hackathon
-          if (event.ID == chan.metadata.id) {
-            // We found a dispute for one of our channels
-            
-          }
+  Future<List<ChannelObj>> watchDisputes() async {
+    List<ChannelObj> list = List.empty(growable: true);
+    Stream<Open> stream = await waitForOpenEvent();
+    print("tick");
+    await for (Open event in stream) {
+      print("Found Open event for channel with ID ${event.ID}");
+      for (ChannelObj chan in channels) { 
+        // TODO this could be done a bit better, but hackathon
+        if (event.ID == chan.metadata.id) {
+          // We found a dispute for one of our channels
+          list.add(chan);
         }
       }
-      sleep(Duration(seconds: 10));
     }
+    return list;
   }
 
 

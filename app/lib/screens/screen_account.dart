@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:app/components/default_sliver_app_bar_title.dart';
 import 'package:app/data/style.dart';
+import 'package:app/screens/screen_dispute.dart';
 import 'package:app/screens/screen_history_channels.dart';
 import 'package:app/screens/screen_new_channel.dart';
+import 'package:app/services/Channel.g.dart';
 import 'package:app/services/database.dart';
 import 'package:app/services/ethereum_connect.dart';
 import 'package:app/services/link.dart';
 import 'package:app/services/network.dart';
-import 'package:app/services/walletconnect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:walletconnect_modal_flutter/walletconnect_modal_flutter.dart';
 import 'package:app_links/app_links.dart';
 
 import '../services/formatting.dart';
@@ -81,7 +81,7 @@ class _AccountScreenState extends State<AccountScreen>
   Widget build(BuildContext context) {
     final ScrollController _scrollController = ScrollController();
     late final TabController _tabController = TabController(
-      length: 2,
+      length: 3,
       vsync: this,
     );
 
@@ -93,6 +93,9 @@ class _AccountScreenState extends State<AccountScreen>
       HistoryChannels(
         key: ValueKey(2),
       ),
+      NewDispute(
+        key: ValueKey(3),
+      )
     ];
 
     return CupertinoPageScaffold(
@@ -272,6 +275,7 @@ class _AccountScreenState extends State<AccountScreen>
                           tabs: [
                             Text('Current Channels'),
                             Text('History'),
+                            Text('Disputes'),
                           ],
                         )),
                   ),
