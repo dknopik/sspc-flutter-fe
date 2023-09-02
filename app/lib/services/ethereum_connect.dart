@@ -105,6 +105,62 @@ class MyWallet {
   Uint8List address() {
     return wallet.privateKey.address.addressBytes;
   }
+
+  void setupDisputeWatcher() async {
+    while (true) {
+      Stream<Closing> stream = await waitForClosingEvent();
+      await for (Closing event in stream) {
+        for (ChannelObj chan in channels) { 
+          // TODO this could be done a bit better, but hackathon
+          if (event.ID == chan.metadata.id) {
+            // We found a dispute for one of our channels
+            
+          }
+        }
+      }
+      sleep(Duration(seconds: 10));
+    }
+  }
+
+
+  // Event filtering
+
+  Future<Stream<Open>> waitForOpenEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.openEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Accepted>> waitForAcceptedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.acceptedEvents(
+        fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Closing>> waitForClosingEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.closingEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<Stream<Closed>> waitForClosedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.closedEvents(fromBlock: from, toBlock: BlockNum.current());
+  }
 }
 
 class EthMetaData {
@@ -364,43 +420,30 @@ class ChannelObj {
     print("hell");
   }
 
-  // Event filtering
-
-  Future<Stream<Open>> waitForOpenEvent() async {
-    int currentBlock = await client.getBlockNumber();
-    if (currentBlock < FILTER_OFFSET) {
-      throw const FormatException("current block too low");
+  Future<void> dispute() async {
+    BigInt valueA;
+    BigInt valueB;
+    if (metadata.isProposer) {
+      valueA = metadata.myBal;
+      valueB = metadata.otherBal;
+    } else {
+      valueA = metadata.otherBal;
+      valueB = metadata.myBal;
     }
-    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
-    return contract.openEvents(fromBlock: from, toBlock: BlockNum.current());
-  }
-
-  Future<Stream<Accepted>> waitForAcceptedEvent() async {
-    int currentBlock = await client.getBlockNumber();
-    if (currentBlock < FILTER_OFFSET) {
-      throw const FormatException("current block too low");
+    StateUpdate? last;
+    for (StateUpdate update in history.reversed) {
+      if (update.sender == PEER_SEND) {
+        last = update;
+        break;
+      }
     }
-    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
-    return contract.acceptedEvents(
-        fromBlock: from, toBlock: BlockNum.current());
-  }
-
-  Future<Stream<Closing>> waitForClosingEvent() async {
-    int currentBlock = await client.getBlockNumber();
-    if (currentBlock < FILTER_OFFSET) {
-      throw const FormatException("current block too low");
+    if (last == null) {
+      throw Exception("No suitable state found");
     }
-    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
-    return contract.closingEvents(fromBlock: from, toBlock: BlockNum.current());
-  }
-
-  Future<Stream<Closed>> waitForClosedEvent() async {
-    int currentBlock = await client.getBlockNumber();
-    if (currentBlock < FILTER_OFFSET) {
-      throw const FormatException("current block too low");
-    }
-    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
-    return contract.closedEvents(fromBlock: from, toBlock: BlockNum.current());
+    
+    String res = await contract.disputeChallenge(
+        metadata.id, valueA, valueB, last.round, last.signature,
+        credentials: wallet.privateKey);
   }
 
   // helper

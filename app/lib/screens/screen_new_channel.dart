@@ -222,8 +222,8 @@ class _NewChannelState extends State<NewChannel> {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFB2A2EA),
-                  Color(0xFF5842C2),
+                  Color(int.parse(data.other.hexEip55.substring(2,10), radix: 16)),
+                  Color(int.parse(data.other.hexEip55.substring(12,20), radix: 16)),
                 ], // Your gradient colors
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -239,7 +239,7 @@ class _NewChannelState extends State<NewChannel> {
                   )));
         },
         state: 'You: ${formatValue(data.myBal)} | They: ${formatValue(data.otherBal)}',
-        title: '',
+        title: 'Peer: ${data.other}',
       );
     }
 
