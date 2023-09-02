@@ -44,6 +44,9 @@ dependencies:
   path_provider: ^2.1.1
   sqlite3_flutter_libs: ^0.5.16
   sqflite_common_ffi_web: ^0.4.0
+  rational: ^2.2.2
+  decimal: ^2.3.3
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

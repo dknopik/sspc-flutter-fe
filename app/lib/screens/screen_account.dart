@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:walletconnect_modal_flutter/walletconnect_modal_flutter.dart';
 import 'package:app_links/app_links.dart';
 
+import '../services/formatting.dart';
+
 class AccountScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _AccountScreenState();
@@ -226,27 +228,15 @@ class _AccountScreenState extends State<AccountScreen>
                                               text: TextSpan(
                                             children: [
                                               TextSpan(
-                                                text: "Balance: " + totalBalance.toString(),
-                                                style: Style.title,
-
-                                              ),
-                                              TextSpan(
-                                                text: ' wei',
-                                                style: TextStyle(
-                                                  color: Color(0xFF565559),
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.1,
-                                                ),
+                                                text: "Balance: ${formatValue(totalBalance)}",
+                                                style: Style.normal,
                                               )
                                             ],
                                           )),
                                           SizedBox(
                                             height: 5,
                                           ),
-                                          Text(
-                                            onChainBalance.toString() +
-                                                ' wei confirmed',
+                                          Text('${formatValue(onChainBalance)} confirmed',
                                             style: Style.hidden,
                                           ),
                                         ],

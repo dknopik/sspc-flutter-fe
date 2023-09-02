@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:app/screens/screen_channel_detail_screen.dart';
 import 'package:app/services/network.dart';
 
+import '../services/formatting.dart';
+
 class HistoryChannels extends StatefulWidget {
 
   const HistoryChannels({
@@ -93,7 +95,7 @@ class _HistoryChannelsState extends State<HistoryChannels> {
                                 network: network,
                               )));
                     },*/
-                    state: 'You: ${metaData.myBal} wei | They: ${metaData.otherBal} wei',
+                    state: 'You: ${formatValue(metaData.myBal)} | They: ${formatValue(metaData.otherBal)}',
                     title: 'Channel ${id.substring(0, 8)} with Peer ${metaData.other.hexEip55}',  
                 );
             })

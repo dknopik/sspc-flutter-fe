@@ -3,6 +3,7 @@ import 'package:app/screens/modal_accept.dart';
 import 'package:app/screens/modal_close.dart';
 import 'package:app/screens/modal_reject.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/formatting.dart';
 import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -127,7 +128,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                         text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: '${state.last.myBal} wei',
+                                          text: formatValue(state.last.myBal),
                                           style: Style.title,
                                         ),
                                       ],
@@ -147,7 +148,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '${state.last.otherBal} wei',
+                                      formatValue(state.last.otherBal),
                                       style: TextStyle(
                                         color: Color(0xFF565559),
                                         fontSize: 14,
@@ -189,7 +190,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           children: [
                             SizedBox(),
                             Text(
-                              'opening state: You: ${state.first.myBal} wei | They: ${state.first.otherBal} wei',
+                              'opening state: You: ${formatValue(state.first.myBal)} | They: ${formatValue(state.first.otherBal)} wei',
                               style: Style.hidden,
                             ),
                           ],
@@ -374,7 +375,7 @@ class Transaction extends StatelessWidget {
         ? 'sending ${prevUpdate!.myBal - update.myBal}'
         : 'receiving ${update.myBal - prevUpdate!.myBal}';
     }
-    String state = 'You: ${update.myBal} wei | They: ${update.otherBal} wei';
+    String state = 'You: ${formatValue(update.myBal)} | They: ${formatValue(update.otherBal)}';
     
     return Padding(
       padding: const EdgeInsets.all(10.0),

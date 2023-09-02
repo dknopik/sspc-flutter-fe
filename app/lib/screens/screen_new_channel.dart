@@ -18,6 +18,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:ui' as ui;
 
+import '../services/formatting.dart';
+
 class NewChannel extends StatefulWidget {
   final NFCNetwork nfcNetwork;
 
@@ -236,7 +238,7 @@ class _NewChannelState extends State<NewChannel> {
                     network: network,
                   )));
         },
-        state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',
+        state: 'You: ${formatValue(data.myBal)} | They: ${formatValue(data.otherBal)}',
         title: '',
       );
     }
@@ -261,7 +263,7 @@ class _NewChannelState extends State<NewChannel> {
         ),
         head: Icon(CupertinoIcons.arrow_2_circlepath),
         onTap: () {},
-        state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',
+        state: 'You: ${formatValue(data.myBal)} | They: ${formatValue(data.otherBal)}',
         title: 'Pending...',
       );
     }
@@ -320,7 +322,7 @@ class _NewChannelState extends State<NewChannel> {
         ),
         head: Icon(CupertinoIcons.arrow_up_arrow_down),
         onTap: () {},
-        state: 'You: ${data.myBal} wei | They: ${data.otherBal} wei',
+        state: 'You: ${formatValue(data.myBal)} | They: ${formatValue(data.otherBal)}',
         title: 'New request',
       );
     }
