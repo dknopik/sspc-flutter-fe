@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:app/services/ethereum_connect.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
@@ -158,24 +159,22 @@ void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
       break;
     case 1: // Channel update
       Uint8List id = msg.id;
-      print("on");
-      MyWallet().channels.forEach(
-              (element)
-          {if (element.metadata.id == id) {
-            try {
-              print("a");
-              element.receivedMoney(asStateUpdate(msg));
-            } catch (e) {
-              print(e);
-            }
-          }});
+      for (var element in MyWallet().channels) {
+        if (listEquals(element.metadata.id, id)) {
+          try {
+            element.receivedMoney(asStateUpdate(msg));
+          } catch (e) {
+            print(e);
+          }
+        }
+      }
       break;
     case 2: // Channel closing
       Uint8List id = msg.id;
-      MyWallet().channels.forEach(
-              (element)
-          {if (element.metadata.id == id) {
-            element.coopClose(asSignature(msg));
-          }});
+      for (var element in MyWallet().channels) {
+        if (element.metadata.id == id) {
+          element.coopClose(asSignature(msg));
+        }
+      }
   }
 }

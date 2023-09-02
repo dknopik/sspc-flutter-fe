@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:app/services/Channel.g.dart';
 import 'package:app/services/database.dart';
 import 'package:app/services/platform.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:typed_data';
@@ -184,9 +185,9 @@ class EthMetaData {
 
   Uint8List encode() {
     if (isProposer) {
-      return Rlp.encode([us.addressBytes, other.addressBytes, myBal, otherBal, round]);
+      return Rlp.encode([id, us.addressBytes, other.addressBytes, myBal, otherBal, round]);
     } else {
-      return Rlp.encode([other.addressBytes, us.addressBytes, otherBal, myBal, round]);
+      return Rlp.encode([id, other.addressBytes, us.addressBytes, otherBal, myBal, round]);
     }
   }
 
@@ -358,8 +359,9 @@ class ChannelObj {
     BigInt newOtherBal = metadata.otherBal + value;
     metadata.round += BigInt.one;
     _updateBalances(newMyBal, newOtherBal);
+    print(metadata.toMap());
     Uint8List sig =
-        wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+        wallet.privateKey.signToUint8List(metadata.encode());
     ChannelDB().updateMetaData(metadata);
     // Update History
     StateUpdate update = StateUpdate(
@@ -395,28 +397,30 @@ class ChannelObj {
     bool otherProposer = !metadata.isProposer;
     EthMetaData toTest = EthMetaData(
         id: metadata.id,
-        us: metadata.us,
-        other: metadata.other,
-        myBal: update.myBal,
-        otherBal: update.otherBal,
+        us: metadata.other,
+        other: metadata.us,
+        myBal: update.otherBal,
+        otherBal: update.myBal,
         isProposer: otherProposer,
         round: metadata.round + BigInt.one);
     // implicitly makes sure that the peer only signed round + 1
 
+    print(toTest.toMap());
     Uint8List hash = keccak256(toTest.encode());
     Uint8List pk = ecRecover(
         hash,
         uint8ListToSig(
             update.signature)); // you can probably malleability attack this!
-    if (publicKeyToAddress(pk) != metadata.other.addressBytes) {
+    if (!listEquals(publicKeyToAddress(pk), metadata.other.addressBytes)) {
       throw const FormatException("invalid parameter, invalid signature");
     }
     print("to");
     // Update state
-    ChannelDB().updateMetaData(metadata);
     update.sender = PEER_SEND;
     addUpdate(update);
     _updateBalances(update.myBal, update.otherBal);
+    metadata.round = metadata.round + BigInt.one;
+    ChannelDB().updateMetaData(metadata);
     print("hell");
   }
 

@@ -8,8 +8,11 @@ import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
+import '../services/link.dart';
 import 'modal_propose.dart';
+import 'modal_show_qr_code.dart';
 
 class ChannelDetailScreen extends StatefulWidget {
   final ChannelObj channel;
@@ -366,33 +369,53 @@ class Transaction extends StatelessWidget {
     }
     String state = 'You: ${formatValue(update.myBal)} | They: ${formatValue(update.otherBal)}';
     
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(children: [
-            Container(width: 30, child: 
-              Icon(
-                update.round == BigInt.zero
-                    ? CupertinoIcons.arrow_right_arrow_left
-                    : update.sender == WE_SEND
-                      ? CupertinoIcons.arrow_up
-                      : CupertinoIcons.arrow_down,
+    return InkWell(
+      onTap: () {
+        if (update.sender == WE_SEND) {
+          String link = toLink(fromStateUpdate(update));
+          showMaterialModalBottomSheet(
+            expand: false,
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => ModalQR(
+              builder: QrImageView(
+                data: link,
+                version: QrVersions.auto,
+                size: 200.0,
+              ),
+              data: link,
+            )
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(children: [
+              Container(width: 30, child:
+                Icon(
+                  update.round == BigInt.zero
+                      ? CupertinoIcons.arrow_right_arrow_left
+                      : update.sender == WE_SEND
+                        ? CupertinoIcons.arrow_up
+                        : CupertinoIcons.arrow_down,
+                      )),
+              SizedBox(width: 20),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     )),
-            SizedBox(width: 20),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  )),
-              SizedBox(height: 5),
-              Text(state)
+                SizedBox(height: 5),
+                Text(state)
+              ]),
             ]),
-          ]),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }
