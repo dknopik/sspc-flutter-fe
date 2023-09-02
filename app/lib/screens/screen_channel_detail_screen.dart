@@ -315,27 +315,33 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
-                  'history transactions',
+                  'Transaction History',
                   style: Style.normal,
                 ),
               ),
-
+              Divider(
+                color: Colors.grey
+              ),
               // a list of all the proposed transactions, both signed and unsigned, in sequence
               // highlight the ones signed by both parties - non proposal ones
               Expanded(
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  reverse: true,
-                  itemCount: state.length,
-                  itemBuilder: (context, i) {
-                    if (i == 0) {
-                      return Transaction(update: state[i], prevUpdate: null);
-                    } else {
-                      return Transaction(update: state[i], prevUpdate: state[i-1]);
-                    }
-                  },
-                ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    reverse: true,
+                    itemCount: state.length,
+                    itemBuilder: (context, i) {
+                      if (i == 0) {
+                        return Transaction(update: state[i], prevUpdate: null);
+                      } else {
+                        return Transaction(update: state[i], prevUpdate: state[i-1]);
+                      }
+                    },
+                  ),
+                )
+                  
               ),
 
               // receiver side: accept with signature; deny (what happens? send old transaction back?)

@@ -96,7 +96,7 @@ class _HistoryChannelsState extends State<HistoryChannels> {
                               )));
                     },*/
                     state: 'You: ${formatValue(metaData.myBal)} | They: ${formatValue(metaData.otherBal)}',
-                    title: 'Channel ${id.substring(0, 8)} with Peer ${metaData.other.hexEip55}',  
+                    title: 'Channel ${id.substring(0, 8)} \nwith Peer ${metaData.other.hexEip55}',  
                 );
             })
             ]
