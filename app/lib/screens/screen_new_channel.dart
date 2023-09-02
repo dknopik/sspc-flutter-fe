@@ -361,26 +361,33 @@ class Channel extends StatelessWidget {
       onTap: () {
         onTap();
       },
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(children: [
-              Container(width: 30, child: head),
-              SizedBox(width: 20),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    )),
-                SizedBox(height: 5),
-                Text(state)
+      child: Container(
+        margin: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Style.background,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(children: [
+                Container(width: 30, child: head),
+                SizedBox(width: 20),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      )),
+                  SizedBox(height: 5),
+                  Text(state)
+                ]),
               ]),
-            ]),
-            actions,
-          ],
+              actions,
+            ],
+          ),
         ),
       ),
     );
