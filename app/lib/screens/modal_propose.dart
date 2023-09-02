@@ -6,8 +6,8 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class ModalPropose extends StatefulWidget {
   final bool sending;
-  final int prevA;
-  final int prevB;
+  final BigInt prevA;
+  final BigInt prevB;
   final ChannelObj channel;
   final NFCNetwork network;
 
@@ -25,7 +25,7 @@ class ModalPropose extends StatefulWidget {
 }
 
 class _ModalProposeState extends State<ModalPropose> {
-  int money = 10;
+  BigInt money = BigInt.from(10);
   final _controller = TextEditingController();
   bool _isKeyboardVisible = false;
 
@@ -96,7 +96,7 @@ class _ModalProposeState extends State<ModalPropose> {
                       onTap: () {
                         if (money != 0) {
                           setState(() {
-                            money -= 1;
+                            money -= BigInt.one;
                           });
                         }
                       },
@@ -118,7 +118,7 @@ class _ModalProposeState extends State<ModalPropose> {
                   child: TextField(
                     onChanged: (str) {
                       setState(() {
-                        money = int.tryParse(_controller.text) ?? 0;
+                        money = BigInt.tryParse(_controller.text) ?? BigInt.zero;
                       });
                     },
                     controller: _controller,
@@ -142,7 +142,7 @@ class _ModalProposeState extends State<ModalPropose> {
                   child: InkWell(
                       onTap: () {
                         setState(() {
-                          money += 1;
+                          money += BigInt.one;
                         });
                       },
                       child: CircleAvatar(
@@ -174,7 +174,7 @@ class _ModalProposeState extends State<ModalPropose> {
                 onTap: () {
                   Navigator.pop(context);
                   if (widget.sending) {
-                    StateUpdate update = widget.channel.sendMoney(BigInt.from(money));
+                    StateUpdate update = widget.channel.sendMoney(money);
                     widget.network.send(List.from([fromStateUpdate(update)]));
                   }
                 },

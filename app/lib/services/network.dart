@@ -132,6 +132,7 @@ StateUpdate asStateUpdate(NetworkMessage msg) {
     myBal: msg.myBal,
     otherBal: msg.otherBal,
     round: msg.round,
+    sender: PEER_SEND,
     signature: msg.sigOrAddr);
 }
 

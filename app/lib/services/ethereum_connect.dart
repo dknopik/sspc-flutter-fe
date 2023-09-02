@@ -16,6 +16,8 @@ import 'package:rlp/rlp.dart';
 const COOPERATIVE_CLOSE_ROUND = "ffffffffffffffffffffffffffffffff";
 const FILTER_OFFSET = 1000;
 const CONTRACT_ADDR = "0xa23Cd49f677431f4eB23226b8c2150E24912070f";
+const WE_SEND = true;
+const PEER_SEND = false;
 
 class MyWallet {
 
@@ -154,6 +156,7 @@ class StateUpdate {
   BigInt myBal;
   BigInt otherBal;
   BigInt round;
+  bool sender;
   Uint8List signature;
 
   StateUpdate({
@@ -161,6 +164,7 @@ class StateUpdate {
     required this.myBal,
     required this.otherBal,
     required this.round,
+    required this.sender,
     required this.signature,
   });
 }
@@ -211,6 +215,7 @@ class ChannelObj {
         myBal: myBal,
         otherBal: otherBal,
         round: BigInt.zero,
+        sender: WE_SEND,
         signature: Uint8List(0)));
     return id;
   }
@@ -238,6 +243,7 @@ class ChannelObj {
         myBal: myBal,
         otherBal: otherBal,
         round: BigInt.zero,
+        sender: PEER_SEND,
         signature: Uint8List(0)));
   }
 
@@ -277,13 +283,14 @@ class ChannelObj {
     _updateBalances(newMyBal, newOtherBal);
     Uint8List sig =
         wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
-     ChannelDB().updateMetaData(metadata);
+    ChannelDB().updateMetaData(metadata);
     // Update History
     StateUpdate update = StateUpdate(
         id: metadata.id,
         myBal: newMyBal,
         otherBal: newOtherBal,
         round: metadata.round,
+        sender: WE_SEND,
         signature: sig);
     history.add(update);
     return update;
@@ -328,6 +335,7 @@ class ChannelObj {
     }
     // Update state
     ChannelDB().updateMetaData(metadata);
+    update.sender = PEER_SEND;
     history.add(update);
     _updateBalances(update.myBal, update.otherBal);
   }

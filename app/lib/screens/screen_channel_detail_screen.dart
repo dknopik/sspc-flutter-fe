@@ -124,18 +124,9 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                         text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: '1254',
+                                          text: '${state.last.myBal} wei',
                                           style: Style.title,
                                         ),
-                                        TextSpan(
-                                          text: '.00 wei',
-                                          style: TextStyle(
-                                            color: Color(0xFF565559),
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w400,
-                                            height: 1.1,
-                                          ),
-                                        )
                                       ],
                                     )),
                                   ],
@@ -153,7 +144,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '13.00 wei',
+                                      '${state.last.otherBal} wei',
                                       style: TextStyle(
                                         color: Color(0xFF565559),
                                         fontSize: 14,
@@ -231,17 +222,19 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           Text('Send')
                         ],
                       ),
-                      onTap: () => showMaterialModalBottomSheet(
-                        expand: false,
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => ModalPropose(
-                            sending: true,
-                            prevA: a,
-                            prevB: b,
-                            channel: widget.channel,
-                            network: widget.network),
-                      ),
+                      onTap: () => {
+                        showMaterialModalBottomSheet(
+                          expand: false,
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => ModalPropose(
+                              sending: true,
+                              prevA: state.last.myBal,
+                              prevB: state.last.otherBal,
+                              channel: widget.channel,
+                              network: widget.network),
+                        ),
+                      }
                     ),
                   ),
                   Container(
@@ -270,8 +263,8 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         backgroundColor: Colors.transparent,
                         builder: (context) => ModalPropose(
                           sending: false,
-                          prevA: a,
-                          prevB: b,
+                          prevA: state.last.myBal,
+                          prevB: state.last.otherBal,
                           channel: widget.channel,
                           network: widget.network,
                         ),
@@ -311,88 +304,6 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                   ),
                 ],
               ),
-              /*
-              if (!state[0].signedByA ||
-                  !state[0]
-                      .signedByB) // if either not signed, actions needed
-                Transaction(
-                    head: Icon(
-                      state[0].init
-                          ? CupertinoIcons.arrow_right_arrow_left
-                          : state[0].sending
-                              ? CupertinoIcons.arrow_up
-                              : CupertinoIcons.arrow_down,
-                    ),
-                    title: !state[0].init && state[0].sending
-                        ? 'sending ${state[0].prevA - state[0].newA}'
-                        : !state[0].init && !state[0].sending
-                            ? 'receiving ${state[0].newA - state[0].prevA}'
-                            : ' ',
-                    state:
-                        'You: ${state[0].newA} wei | They: ${state[0].newB} wei',
-                    actions: (state[0].signedByA)
-                        ? Text('waiting for confirmation')
-                        : (state[0].signedByB)
-                            ? Row(
-                                children: [
-                                  Container(
-                                    width: 55,
-                                    child: GestureDetector(
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            CupertinoIcons.check_mark,
-                                          ),
-                                          Text('Accept')
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        //call function to sign
-                                        showMaterialModalBottomSheet(
-                                          expand: false,
-                                          context: context,
-                                          backgroundColor: Colors.transparent,
-                                          builder: (context) => ModalAccept(
-                                            channel: widget.channel,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 55,
-                                    child: GestureDetector(
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            CupertinoIcons.clear,
-                                          ),
-                                          Text('Reject')
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        //call function to start a new transaction to dispute
-                                        showMaterialModalBottomSheet(
-                                          expand: false,
-                                          context: context,
-                                          backgroundColor: Colors.transparent,
-                                          builder: (context) => ModalReject(
-                                            prevA: a,
-                                            prevB: b,
-                                            channel: widget.channel,
-                                            network: widget.network,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  )
-                                ],
-                              )
-                            : SizedBox()),
-
-              // pending only has two state: waiting for comfirmation or waiting to sign
-              // accept - go into history list; reject - start a different prop (old or new state) - pending from current side
-*/
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
@@ -407,49 +318,14 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
+                  reverse: true,
                   itemCount: state.length,
                   itemBuilder: (context, i) {
-                    /*
-                    return Transaction(
-                      head: Icon(
-                        state[i].init
-                            ? CupertinoIcons.arrow_right_arrow_left
-                            : state[i].sending
-                                ? CupertinoIcons.arrow_up
-                                : CupertinoIcons.arrow_down,
-                      ),
-                      title: !state[i].init && state[i].sending
-                          ? 'sending ${state[i].prevA - state[i].newA}'
-                          : !state[i].init && !state[i].sending
-                              ? 'receiving ${state[i].newA - state[i].prevA}'
-                              : ' ',
-                      state:
-                          'You: ${state[i].newA} wei | They: ${state[i].newB} wei',
-                      actions: Container(
-                        width: 55,
-                        child: Column(
-                          children: [
-                            Icon(
-                              state[i].signedByA && !state[i].signedByB
-                                  ? CupertinoIcons.square_arrow_up
-                                  : !state[i].signedByA &&
-                                          state[i].signedByB
-                                      ? CupertinoIcons.square_arrow_down
-                                      : CupertinoIcons.check_mark,
-                            ),
-                            Text(
-                              state[i].signedByA && !state[i].signedByB
-                                  ? 'propose'
-                                  : !state[i].signedByA &&
-                                          state[i].signedByB
-                                      ? 'request'
-                                      : 'settled',
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                    */
+                    if (i == 0) {
+                      return Transaction(update: state[i], prevUpdate: null);
+                    } else {
+                      return Transaction(update: state[i], prevUpdate: state[i-1]);
+                    }
                   },
                 ),
               ),
@@ -465,52 +341,48 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
   }
 }
 
-class ChannelTransaction {
-  int prevA;
-  int prevB;
-  int newA;
-  int newB;
-  bool sending;
-  bool signedByA; //proposal
-  bool signedByB; //confirmation
-  bool
-      init; //case when it is not sending nor receiving, i.e., initial transaction or amount unchanged.
-
-  ChannelTransaction({
-    required this.prevA,
-    required this.prevB,
-    required this.newA,
-    required this.newB,
-    this.sending = false,
-    this.signedByA = false,
-    this.signedByB = false,
-    this.init = false,
-  });
-}
-
 class Transaction extends StatelessWidget {
-  final Widget head;
-  final String title;
-  final String state;
-  final Widget actions;
+
+  final StateUpdate update;
+  final StateUpdate? prevUpdate;
 
   const Transaction({
     super.key,
-    required this.head,
-    required this.title,
-    required this.state,
-    required this.actions,
+    required this.update,
+    required this.prevUpdate,
   });
 
   @override
   Widget build(BuildContext context) {
+    String title = ""; 
+    if (update.round == BigInt.zero) {
+      title = update.sender == WE_SEND ? "We" : "Peer";
+      title += " proposed channel";
+    } else {
+      if (prevUpdate == null) {
+        // should never happen, only the 0 round has no previous round
+        throw Exception("should not happen");
+      }
+      title = update.sender == WE_SEND 
+        ? 'sending ${prevUpdate!.myBal - update.myBal}'
+        : 'receiving ${update.myBal - prevUpdate!.myBal}';
+    }
+    String state = 'You: ${update.myBal} wei | They: ${update.otherBal} wei';
+    
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(children: [
-            Container(width: 30, child: head),
+            Container(width: 30, child: 
+              Icon(
+                update.round == BigInt.zero
+                    ? CupertinoIcons.arrow_right_arrow_left
+                    : update.sender == WE_SEND
+                      ? CupertinoIcons.arrow_up
+                      : CupertinoIcons.arrow_down,
+                    )),
             SizedBox(width: 20),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title,
@@ -522,7 +394,6 @@ class Transaction extends StatelessWidget {
               Text(state)
             ]),
           ]),
-          actions,
         ],
       ),
     );

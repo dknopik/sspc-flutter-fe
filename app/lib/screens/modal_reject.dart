@@ -7,8 +7,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'modal_propose.dart';
 
 class ModalReject extends StatelessWidget {
-  final int prevA;
-  final int prevB;
+  final BigInt prevA;
+  final BigInt prevB;
   final ChannelObj channel;
   final NFCNetwork network;
 
