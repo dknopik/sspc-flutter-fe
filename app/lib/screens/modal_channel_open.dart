@@ -10,6 +10,10 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+import 'modal_pending_tx.dart';
+import 'modal_show_qr_code.dart';
 
 class ModalChannelOpen extends StatefulWidget {
   final NFCNetwork network;
@@ -209,14 +213,38 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
               child: InkWell(
                 onTap: () async {
                   //todo Function Open Channel
-                  Navigator.pop(context);
                   ChannelObj obj = MyWallet().createNewChannel();
                   EthereumAddress other = EthereumAddress.fromHex(_controllerO.text);
-                  Uint8List id =
-                      await obj.open(other, BigInt.from(a), BigInt.from(b));
-                  final msg = fromProposal(id, BigInt.from(a), BigInt.from(b), MyWallet().address());
-                  widget.network.send(List.from([msg]));
-                  print(toLink(msg));
+                  await showMaterialModalBottomSheet(
+                    isDismissible: false,
+                    expand: false,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => ModalPendingTx(tx: obj.open(other, BigInt.from(a), BigInt.from(b))),
+                  ).then((value) async {
+                    if (value != null) {
+                      final msg = fromProposal(value, BigInt.from(a), BigInt.from(b),
+                          MyWallet().address());
+                      final link = toLink(msg);
+                      print(link);
+                      await showMaterialModalBottomSheet(
+                        expand: false,
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => ModalQR(
+                          builder: QrImageView(
+                            data: link,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                          ),
+                          data: link,
+                        )
+                      );
+                    }
+                    return value;
+                  }).then((value) {
+                    Navigator.pop(context);
+                  });
                 },
                 child: Container(
                   alignment: Alignment.center,
