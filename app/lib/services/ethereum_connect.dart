@@ -12,8 +12,8 @@ import 'dart:typed_data';
 import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/credentials.dart';
-import 'package:rlp/rlp.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web3dart/src/utils/length_tracking_byte_sink.dart';
 
 const COOPERATIVE_CLOSE_ROUND = "ffffffffffffffffffffffffffffffff";
 const FILTER_OFFSET = 1000;
@@ -189,11 +189,14 @@ class EthMetaData {
   });
 
   Uint8List encode() {
+    final sink = LengthTrackingByteSink();
+    const type = TupleType([FixedBytes(32), AddressType(), AddressType(), IntType(), IntType(), IntType(length: 128)]);
     if (isProposer) {
-      return Rlp.encode([id, us.addressBytes, other.addressBytes, myBal, otherBal, round]);
+      type.encode([id, us, other, myBal, otherBal, round], sink);
     } else {
-      return Rlp.encode([id, other.addressBytes, us.addressBytes, otherBal, myBal, round]);
+      type.encode([id, other, us, otherBal, myBal, round], sink);
     }
+    return sink.asBytes();
   }
 
   Map<String, dynamic> toMap() {
@@ -332,7 +335,7 @@ class ChannelObj {
 
   Uint8List createCoopClose() {
     metadata.round = BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
-    return wallet.privateKey.signPersonalMessageToUint8List(metadata.encode());
+    return wallet.privateKey.signToUint8List(metadata.encode());
   }
 
   void coopClose(Uint8List sig) async {

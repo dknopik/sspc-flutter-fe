@@ -2,6 +2,11 @@ import 'package:app/services/ethereum_connect.dart';
 import 'package:app/services/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+import '../services/link.dart';
+import 'modal_show_qr_code.dart';
 
 class ModalClose extends StatelessWidget {
   final ChannelObj channel;
@@ -16,6 +21,7 @@ class ModalClose extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
+        padding: EdgeInsets.all(20),
         decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -31,8 +37,20 @@ class ModalClose extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.pop(context);
-                  Uint8List sig = channel.createCoopClose();
-                  network.send(List.from([fromSig(sig)]));
+                  String link = toLink(fromSig(channel.metadata.id, channel.createCoopClose()));
+                  showMaterialModalBottomSheet(
+                    expand: false,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => ModalQR(
+                      builder: QrImageView(
+                        data: link,
+                        version: QrVersions.auto,
+                        size: 200.0,
+                      ),
+                      data: link,
+                    )
+                  );
                 },
                 child: Container(
                   alignment: Alignment.center,

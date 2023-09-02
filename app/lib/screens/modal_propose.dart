@@ -176,10 +176,10 @@ class _ModalProposeState extends State<ModalPropose> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: InkWell(
-                onTap: () async {
+                onTap: () {
                   Navigator.pop(context);
                   String link = toLink(fromStateUpdate(widget.channel.sendMoney(money)));
-                  await showMaterialModalBottomSheet(
+                  showMaterialModalBottomSheet(
                     expand: false,
                     context: context,
                     backgroundColor: Colors.transparent,
@@ -191,9 +191,7 @@ class _ModalProposeState extends State<ModalPropose> {
                       ),
                       data: link,
                     )
-                  ).then((value) {
-                    Navigator.pop(context);
-                  });
+                  );
                 },
                 child: Container(
                   alignment: Alignment.center,

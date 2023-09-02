@@ -48,7 +48,6 @@ dependencies:
   decimal: ^2.3.3
   intl: ^0.18.1
   web3dart: ^2.3.5
-  rlp: ^2.0.0
   web3dart_builders: ^0.0.7
   build_runner: ^2.0.0
   modal_bottom_sheet: 3.0.0-pre

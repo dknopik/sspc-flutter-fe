@@ -123,8 +123,8 @@ NetworkMessage fromStateUpdate(StateUpdate update) {
   return NetworkMessage(type: 1, myBal: update.myBal, otherBal: update.otherBal, round: update.round, sigOrAddr: update.signature, id: update.id);
 }
 
-NetworkMessage fromSig(Uint8List signature) {
-  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, sigOrAddr: signature, id: Uint8List(32));
+NetworkMessage fromSig(Uint8List id, Uint8List signature) {
+  return NetworkMessage(type: 2, myBal: BigInt.zero, otherBal: BigInt.zero, round: BigInt.zero, sigOrAddr: signature, id: id);
 }
 
 StateUpdate asStateUpdate(NetworkMessage msg) {
@@ -172,7 +172,7 @@ void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
     case 2: // Channel closing
       Uint8List id = msg.id;
       for (var element in MyWallet().channels) {
-        if (element.metadata.id == id) {
+        if (listEquals(element.metadata.id, id)) {
           element.coopClose(asSignature(msg));
         }
       }
