@@ -179,7 +179,7 @@ class _NewChannelState extends State<NewChannel> {
           shrinkWrap: true,
           itemCount: MyWallet().channels.length,
           itemBuilder: (context, i) {
-            return _createChannel(MyWallet().channels[i], widget.nfcNetwork);
+            return _createChannel(channels[i], widget.nfcNetwork);
           },
         ),
       ),
