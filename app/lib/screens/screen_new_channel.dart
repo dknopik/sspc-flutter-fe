@@ -32,6 +32,14 @@ class NewChannel extends StatefulWidget {
 
 class _NewChannelState extends State<NewChannel> {
 
+  List<ChannelObj> channels = MyWallet().channels;
+
+  void update() {
+    setState(() {
+      channels = MyWallet().channels;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -65,14 +73,17 @@ class _NewChannelState extends State<NewChannel> {
                   )
                 ],
               ),
-              onTap: () => showMaterialModalBottomSheet(
-                expand: false,
-                context: context,
-                backgroundColor: Colors.transparent,
-                builder: (context) => ModalChannelOpen(
-                  network: widget.nfcNetwork,
+              onTap: () async => {
+                await showMaterialModalBottomSheet(
+                  expand: false,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => ModalChannelOpen(
+                    network: widget.nfcNetwork,
+                  ),
                 ),
-              ),
+                update()
+              }
             ),
           ),
           Container(
@@ -115,6 +126,7 @@ class _NewChannelState extends State<NewChannel> {
                     handleIncomingMessage(msg, context);
                   }
                 }
+                update();
               }
             ),
           ),

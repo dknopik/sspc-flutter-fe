@@ -22,7 +22,7 @@ class ModalClose extends StatelessWidget {
                 topRight: Radius.circular(20), topLeft: Radius.circular(20))),
         child: Wrap(
           children: <Widget>[
-            Text('Do you want to terminate the payment channel with XX?'),
+            Text('Do you want to terminate the payment channel with ${channel.metadata.other}'),
             SizedBox(
               height: 5,
             ),

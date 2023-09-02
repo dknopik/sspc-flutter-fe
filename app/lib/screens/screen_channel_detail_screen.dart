@@ -25,10 +25,13 @@ class ChannelDetailScreen extends StatefulWidget {
 }
 
 class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
-  int a = 2;
-  int b = 13;
-
   List<StateUpdate> state = MyWallet().channels[0].history;
+
+  void update() {
+    setState(() {
+      state = MyWallet().channels[0].history;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -222,21 +225,24 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                           Text('Send')
                         ],
                       ),
-                      onTap: () => {
-                        showMaterialModalBottomSheet(
-                          expand: false,
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => ModalPropose(
-                              sending: true,
-                              prevA: state.last.myBal,
-                              prevB: state.last.otherBal,
-                              channel: widget.channel,
-                              network: widget.network),
-                        ),
+                      onTap: () async => {
+                          await showMaterialModalBottomSheet(
+                            expand: false,
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => ModalPropose(
+                                sending: true,
+                                prevA: state.last.myBal,
+                                prevB: state.last.otherBal,
+                                channel: widget.channel,
+                                network: widget.network),
+                          ),
+                          update()
                       }
                     ),
                   ),
+                  /*
+                  Receive button
                   Container(
                     width: 70,
                     height: 70,
@@ -271,6 +277,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                       ),
                     ),
                   ),
+                  */
                   Container(
                     width: 70,
                     height: 70,
