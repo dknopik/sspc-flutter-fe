@@ -143,14 +143,12 @@ Uint8List asSignature(NetworkMessage msg) {
 void handleIncomingMessage(NetworkMessage msg, BuildContext context) {
   switch (msg.type) {
     case 0: // Channel announcement
-      ChannelObj channel = MyWallet().createNewChannel();
       // trigger modal
       showMaterialModalBottomSheet(
         expand: false,
         context: context,
         backgroundColor: Colors.transparent,
         builder: (context) => ModalAcceptChannel(
-          channel: channel,
           id: msg.id,
           myBal: msg.otherBal, // turn around myBal and otherBal here
           otherBal: msg.myBal,

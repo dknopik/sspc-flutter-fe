@@ -4,13 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
 
 class ModalAcceptChannel extends StatelessWidget {
-  final ChannelObj channel;
   final Uint8List id;
   final BigInt otherBal;
   final BigInt myBal;
   final Uint8List other;
 
-  ModalAcceptChannel({required this.channel, required this.id, required this.otherBal, required this.myBal, required this.other});
+  ModalAcceptChannel({required this.id, required this.otherBal, required this.myBal, required this.other});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +18,7 @@ class ModalAcceptChannel extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
+        padding: EdgeInsets.all(20),
         decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -34,6 +34,7 @@ class ModalAcceptChannel extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   print(other);
+                  ChannelObj channel = MyWallet().createNewChannel();
                   EthereumAddress otherAddr = EthereumAddress(other);
                   channel.accept(id, otherAddr, myBal, otherBal);
                   Navigator.pop(context);
