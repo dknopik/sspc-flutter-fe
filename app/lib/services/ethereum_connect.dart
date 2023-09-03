@@ -40,7 +40,6 @@ class MyWallet {
   String path = "wallet.json";
   String password = "YesIHardcodeMyPasswords";
   String rpc = "https://rpc.public.zkevm-test.net";
-  String ws = "ws://rpc.public.zkevm-test.net";
   List<ChannelObj> channels = List.empty(growable: true);
   late Future<void> initialization;
 
@@ -67,9 +66,7 @@ class MyWallet {
       print(wallet.toJson());
     }
     // connect to RPC client
-    client = Web3Client(rpc, Client(), socketConnector:  () {
-      return IOWebSocketChannel.connect(ws).cast<String>();
-    });
+    client = Web3Client(rpc, Client());
     EthereumAddress addr = EthereumAddress.fromHex(CONTRACT_ADDR);
     chainID = await client.getChainId();
     contract = Channel(address: addr, client: client, chainId: chainID.toInt());
@@ -113,7 +110,7 @@ class MyWallet {
 
   Future<List<ChannelObj>> watchDisputes() async {
     List<ChannelObj> list = List.empty(growable: true);
-    Stream<Open> stream = await waitForOpenEvent();
+    Stream<Open> stream = await waitForOpenEvent(); // TODO change to closing event
     print("tick");
     await for (Open event in stream) {
       print("Found Open event for channel with ID ${event.ID}");

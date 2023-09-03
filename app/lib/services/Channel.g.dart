@@ -249,7 +249,9 @@ class Channel extends _i1.GeneratedContract {
       fromBlock: fromBlock,
       toBlock: toBlock,
     );
-    return client.events(filter).map((_i1.FilterEvent result) {
+    Stream<_i1.FilterEvent> s =  Stream.fromFuture(client.getLogs(filter))
+          .expand((e) => e); 
+    return s.map((_i1.FilterEvent result) {
       final decoded = event.decodeResults(
         result.topics!,
         result.data!,
@@ -273,7 +275,9 @@ class Channel extends _i1.GeneratedContract {
       fromBlock: fromBlock,
       toBlock: toBlock,
     );
-    return client.events(filter).map((_i1.FilterEvent result) {
+    Stream<_i1.FilterEvent> s =  Stream.fromFuture(client.getLogs(filter))
+          .expand((e) => e); 
+    return s.map((_i1.FilterEvent result) {
       final decoded = event.decodeResults(
         result.topics!,
         result.data!,
@@ -297,7 +301,9 @@ class Channel extends _i1.GeneratedContract {
       fromBlock: fromBlock,
       toBlock: toBlock,
     );
-    return client.events(filter).map((_i1.FilterEvent result) {
+    Stream<_i1.FilterEvent> s =  Stream.fromFuture(client.getLogs(filter))
+          .expand((e) => e); 
+    return s.map((_i1.FilterEvent result) {
       final decoded = event.decodeResults(
         result.topics!,
         result.data!,
@@ -321,7 +327,9 @@ class Channel extends _i1.GeneratedContract {
       fromBlock: fromBlock,
       toBlock: toBlock,
     );
-    return client.events(filter).map((_i1.FilterEvent result) {
+    Stream<_i1.FilterEvent> s =  Stream.fromFuture(client.getLogs(filter))
+          .expand((e) => e); 
+    return s.map((_i1.FilterEvent result) {
       final decoded = event.decodeResults(
         result.topics!,
         result.data!,
