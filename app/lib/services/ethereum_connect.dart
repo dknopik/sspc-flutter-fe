@@ -119,7 +119,7 @@ class MyWallet {
       print("Found Open event for channel with ID ${event.ID}");
       for (ChannelObj chan in channels) { 
         // TODO this could be done a bit better, but hackathon
-        if (event.ID == chan.metadata.id) {
+        if (listEquals(event.ID, chan.metadata.id)) {
           // We found a dispute for one of our channels
           list.add(chan);
         }
