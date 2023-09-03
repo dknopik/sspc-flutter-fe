@@ -102,7 +102,6 @@ class _HistoryChannelsState extends State<HistoryChannels> {
             ]
           );
         } else {
-          data = ChannelDB().getMetaData();
           return Text('Reading database');
         }
       }

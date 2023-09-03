@@ -49,7 +49,6 @@ class _NewDisputeState extends State<NewDispute> {
             ]
           );
         } else {
-          data = MyWallet().watchDisputes();
           return Text('Looking for dispute events');
         }
       }
