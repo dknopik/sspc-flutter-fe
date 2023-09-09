@@ -64,14 +64,12 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-
-    super.setState(() {}); // to update widget data
     // get onchain confirmed balance
     // get balance across all channels
     onChainBalance = await MyWallet().getOnChainBalance();
     totalBalance = await MyWallet().getTotalBalance();
     print('started listener');
-    network.startListener(context);
+    //network.startListener(context);
 
     await ChannelDB().getChannels(MyWallet()); // Read old channels from db
     super.setState(() {}); // to update widget data
