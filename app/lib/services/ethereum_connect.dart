@@ -13,7 +13,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web3dart/src/utils/length_tracking_byte_sink.dart';
+//import 'package:web3dart/src/utils/length_tracking_byte_sink.dart';
 
 const COOPERATIVE_CLOSE_ROUND = "ffffffffffffffffffffffffffffffff";
 const FILTER_OFFSET = 1000;
@@ -52,7 +52,7 @@ class MyWallet {
     } catch(e) {
       fullPath = path;
     }
-    // Create (or open) wallet
+    // Create (or open) wlooallet
     try {
       print(fullPath);
       wallet = Wallet.fromJson(loadFile(fullPath), password);

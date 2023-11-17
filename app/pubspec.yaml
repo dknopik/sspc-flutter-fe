@@ -47,7 +47,7 @@ dependencies:
   rational: ^2.2.2
   decimal: ^2.3.3
   intl: ^0.18.1
-  web3dart: ^2.3.5
+  web3dart: ^2.7.0
   web3dart_builders: ^0.0.7
   build_runner: ^2.0.0
   modal_bottom_sheet: 3.0.0-pre
@@ -56,6 +56,7 @@ dependencies:
   qr_flutter: ^4.1.0
   qr_code_scanner: ^1.0.1
   web_socket_channel: ^2.4.0
+  web3modal_flutter: ^3.0.0
 
 dev_dependencies:
   flutter_test:

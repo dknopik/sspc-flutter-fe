@@ -1,5 +1,4 @@
-
-import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 import 'package:web3dart/web3dart.dart';
 
 class WalletConnect {
@@ -13,10 +12,26 @@ class WalletConnect {
     return _instance;
   }
 
+  final _w3mService = W3MService(
+    projectId: '{YOUR_PROJECT_ID}',
+    metadata: const PairingMetadata(
+      name: 'SSPC - Stupid Simple Payment Channels',
+      description: 'App for interacting with payment channels',
+      url: 'https://www.walletconnect.com/',
+      icons: ['https://walletconnect.com/walletconnect-logo.png'],
+      redirect: Redirect(
+        native: 'flutterdapp://',
+        universal: 'https://www.walletconnect.com',
+      ),
+    ),
+  );
+
   WalletConnect._internal() {
     print("initializing walletconnect");
-    init();
+    _w3mService.init();
   }
+
+  
 
   void init() async {
     client = await Web3App.createInstance(
@@ -43,12 +58,16 @@ class WalletConnect {
   }
 
   dynamic sign(EthereumAddress address, String message) async {
-    return await client.request(
-      topic: session.topic,
+    IWeb3App? app = _w3mService.web3App;
+    if (app == null) {
+      return;
+    }
+    return await app.request(
+      topic: "SPCC",
       chainId: 'eip155:1',
       request: SessionRequestParams(
-        method: 'eth_sign',
-        params: [address.hex, message],
+        method: 'personalSign',
+        params: [message, address],
       ),
     );
   }

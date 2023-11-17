@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:convert/convert.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -97,8 +98,8 @@ class NetworkMessage {
       "myBal": myBal.toString(),
       "otherBal": otherBal.toString(),
       "round": round.toString(),
-      "signature": sigOrAddr.toHexString(),
-      "id": id.toHexString(),
+      "signature": hex.encode(sigOrAddr),
+      "id": hex.encode(id),
     };
   }
 

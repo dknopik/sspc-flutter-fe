@@ -68,7 +68,7 @@ class _ModalChannelOpenState extends State<ModalChannelOpen> {
           alignment: WrapAlignment.center,
           children: <Widget>[
             if (_isKeyboardVisible) SizedBox(height: 16),
-
+            //ModalWalletConnect(),
             Column(
               // TODO no need for A B state when openning channel?
               crossAxisAlignment: CrossAxisAlignment.start,
