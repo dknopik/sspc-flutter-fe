@@ -1,5 +1,5 @@
 # sspc-flutter-fe
-EthMunich 2023
+Backend developed at EthGlobal Istanbul, app developed at EthMunich 2023
 
 # You have to set up app signing
 1. ask daniel for the key file and put it somewhere on your system
