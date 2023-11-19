@@ -6,7 +6,7 @@ mod state;
 use crate::calls::*;
 use crate::chain_listener::listen_chain;
 use crate::state::load_state;
-use axum::routing::{delete, post};
+use axum::routing::{delete, get, post};
 use axum::Router;
 use clap::Parser;
 use color_eyre::eyre::Result;
@@ -45,6 +45,7 @@ async fn main() -> Result<()> {
     let chain_listener = tokio::spawn(listen_chain(args.node, args.contract, state));
 
     let app = Router::new()
+        .route("/", get(help))
         .route("/app", post(register_app))
         .route("/app/:id", delete(unregister_app).get(check_app))
         .with_state(state);
