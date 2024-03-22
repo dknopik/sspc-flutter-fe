@@ -3,6 +3,7 @@ use tokio::sync::OnceCell;
 use url::Url;
 use color_eyre::Result;
 
+// todo: no global variable :(
 static CLIENT: OnceCell<reqwest::Client> = OnceCell::const_new();
 
 #[derive(Serialize)]

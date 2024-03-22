@@ -22,7 +22,8 @@ pub async fn register_app(State(state): State<&BackendState>, Json(args): Json<R
     let address = args.address.parse().map_err(|err| StatusCode::BAD_REQUEST)?;
     let mut cache = state.address_cache.lock().await;
     if cache.get(&address).is_some() {
-       return Err(StatusCode::CONFLICT.into());
+        // TODO: maybe return old ID?
+        return Err(StatusCode::CONFLICT.into());
     }
     let id = rand::random();
     let url_string = args.notification_endpoint.to_string();
