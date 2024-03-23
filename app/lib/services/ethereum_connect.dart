@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:convert/convert.dart';
 
 import 'package:app/services/Channel.g.dart';
 import 'package:app/services/database.dart';
@@ -20,6 +21,13 @@ const FILTER_OFFSET = 1000;
 const CONTRACT_ADDR = "0xa23Cd49f677431f4eB23226b8c2150E24912070f";
 const WE_SEND = true;
 const PEER_SEND = false;
+
+
+final NONEXISTANT = BigInt.from(0);
+final PROPOSED = BigInt.from(1);
+final ACCEPTED = BigInt.from(2);
+final DISPUTED = BigInt.from(3);
+final CLOSED = BigInt.from(4);
 
 class MyWallet {
 
@@ -252,6 +260,7 @@ class ChannelObj {
   Channel contract;
   EthMetaData metadata = EthMetaData(id: Uint8List(32), us: EthereumAddress.fromHex(CONTRACT_ADDR) , other: EthereumAddress.fromHex(CONTRACT_ADDR), myBal: BigInt.zero, otherBal: BigInt.zero, isProposer: false, round: BigInt.zero);
   List<StateUpdate> history = List.empty(growable: true);
+  var accepted = false;
 
   ChannelObj({
     required this.wallet,
@@ -261,6 +270,28 @@ class ChannelObj {
 
   bool isActive() {
     return metadata.round != BigInt.parse(COOPERATIVE_CLOSE_ROUND, radix: 16);
+  }
+
+  Future<Stream<Accepted>> waitForAcceptedEvent() async {
+    int currentBlock = await client.getBlockNumber();
+    if (currentBlock < FILTER_OFFSET) {
+      throw const FormatException("current block too low");
+    }
+    BlockNum from = BlockNum.exact(currentBlock - FILTER_OFFSET);
+    return contract.acceptedEvents(
+        fromBlock: from, toBlock: BlockNum.current());
+  }
+
+  Future<bool> isOpen() async {
+    if (accepted) {
+      return true;
+    }
+    var channel = await contract.channels(metadata.id);
+    if (channel.progression == ACCEPTED) {
+      accepted = true;
+    }
+    print(channel.progression);
+    return accepted;
   }
 
   // Channel API
@@ -275,13 +306,14 @@ class ChannelObj {
 
   Future<Uint8List> open(EthereumAddress otherAddr, BigInt myBal, BigInt otherBal) async {
     Uint8List id = randomID();
-    print(id);
+    print("Opening Channel with id: " + hex.encode(id));
     EthereumAddress myAddr = wallet.privateKey.address;
     // Call contract
     Transaction tx =
         Transaction(value: EtherAmount.fromBigInt(EtherUnit.wei, myBal));
     String res = await contract.open(id, otherAddr, myBal, otherBal,
         credentials: wallet.privateKey, transaction: tx);
+    print("TxHash: " + res);
     // Update Metadata
     metadata = EthMetaData(
         id: id,
@@ -353,12 +385,15 @@ class ChannelObj {
     ChannelDB().updateMetaData(metadata);  
   }
 
-  StateUpdate sendMoney(BigInt value) {
+  Future<StateUpdate> sendMoney(BigInt value) async {
     if (value <= BigInt.zero) {
       throw const FormatException("invalid parameter");
     }
     if (!isActive()) {
       throw const FormatException("sending on closed channel forbidden");
+    }
+    if (!await isOpen()) {
+      throw const FormatException("sending on channel before accepting is forbidden");
     }
     BigInt newMyBal = metadata.myBal - value;
     BigInt newOtherBal = metadata.otherBal + value;

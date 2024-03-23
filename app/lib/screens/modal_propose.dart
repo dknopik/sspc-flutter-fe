@@ -174,9 +174,9 @@ class _ModalProposeState extends State<ModalPropose> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: InkWell(
-                onTap: () {
+                onTap: () async {
+                  String link = toLink(fromStateUpdate(await widget.channel.sendMoney(money)));
                   Navigator.pop(context);
-                  String link = toLink(fromStateUpdate(widget.channel.sendMoney(money)));
                   showMaterialModalBottomSheet(
                     expand: false,
                     context: context,
