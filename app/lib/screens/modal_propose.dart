@@ -14,7 +14,6 @@ class ModalPropose extends StatefulWidget {
   final BigInt prevA;
   final BigInt prevB;
   final ChannelObj channel;
-  final NFCNetwork network;
 
   ModalPropose({
     super.key,
@@ -22,7 +21,6 @@ class ModalPropose extends StatefulWidget {
     required this.prevA,
     required this.prevB,
     required this.channel,
-    required this.network,
   });
 
   @override

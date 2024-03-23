@@ -10,14 +10,12 @@ class ModalReject extends StatelessWidget {
   final BigInt prevA;
   final BigInt prevB;
   final ChannelObj channel;
-  final NFCNetwork network;
 
   ModalReject({
     super.key,
     required this.prevA,
     required this.prevB,
     required this.channel,
-    required this.network,
   });
 
   @override
@@ -52,7 +50,6 @@ class ModalReject extends StatelessWidget {
                       prevA: prevA,
                       prevB: prevB,
                       channel: channel,
-                      network: network,
                     ),
                   );
                 },
@@ -87,7 +84,6 @@ class ModalReject extends StatelessWidget {
                       prevA: prevA,
                       prevB: prevB,
                       channel: channel,
-                      network: network,
                     ),
                   );
                 },

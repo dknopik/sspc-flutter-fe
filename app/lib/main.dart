@@ -7,16 +7,11 @@ import 'package:app/services/walletconnect.dart';
 
 void main(){
   WidgetsFlutterBinding.ensureInitialized();
-  final wallet = MyWallet();
-  ChannelDB();
-  WalletConnect();
-  runApp(MyApp(init: wallet.initialization));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  Future<void> init;
-
-  MyApp({super.key, required this.init});
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -26,16 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FutureBuilder<void>(
-        future: init,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return AccountScreen();
-          } else {
-            return const Text("Loading...");
-          }
-        },
-      )
+      home: AccountScreen()
     );
   }
 }

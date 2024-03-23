@@ -39,7 +39,7 @@ class MyWallet {
   late BigInt chainID;
   String path = "wallet.json";
   String password = "YesIHardcodeMyPasswords";
-  String rpc = "https://rpc.holesky.ethpandaops.io";
+  String rpc = "https://ethereum-holesky-rpc.publicnode.com";
   List<ChannelObj> channels = List.empty(growable: true);
   late Future<void> initialization;
 

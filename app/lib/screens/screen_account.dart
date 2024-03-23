@@ -8,6 +8,7 @@ import 'package:app/screens/screen_new_channel.dart';
 import 'package:app/services/Channel.g.dart';
 import 'package:app/services/database.dart';
 import 'package:app/services/ethereum_connect.dart';
+import 'package:app/services/walletconnect.dart';
 import 'package:app/services/link.dart';
 import 'package:app/services/network.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,24 +24,25 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
-  final NFCNetwork network = NFCNetwork();
 
   final AppLinks appLinks = AppLinks();
   StreamSubscription<Uri>? linkSubscription;
 
   BigInt onChainBalance = BigInt.from(0);
   BigInt totalBalance = BigInt.from(0);
+  bool initialized = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     initLinks();
   }
 
   Future<void> initLinks() async {
+    await ChannelDB().initDB();
     await MyWallet().initialization;
+    WalletConnect();
     final appLink = await appLinks.getInitialAppLink();
     if (appLink != null) {
       print('app link: $appLink');
@@ -51,6 +53,9 @@ class _AccountScreenState extends State<AccountScreen>
     linkSubscription = appLinks.uriLinkStream.listen((appLink) {
       print('late app link: $appLink');
       handleAppLink(appLink);
+    });
+    setState(() {
+      initialized = true;
     });
   }
 
@@ -86,7 +91,6 @@ class _AccountScreenState extends State<AccountScreen>
     final List<Widget> _tabScreens = [
       NewChannel(
         key: ValueKey(1),
-        nfcNetwork: network,
       ),
       HistoryChannels(
         key: ValueKey(2),
@@ -98,7 +102,7 @@ class _AccountScreenState extends State<AccountScreen>
 
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
-      child: SafeArea(
+      child: initialized ? SafeArea(
         child: Material(
           color: Colors.transparent,
           child: NestedScrollView(
@@ -286,7 +290,8 @@ class _AccountScreenState extends State<AccountScreen>
             ),
           ),
         ),
-      ),
+      )
+      : Text("Loading")
     );
   }
 

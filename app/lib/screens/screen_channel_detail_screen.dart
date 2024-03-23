@@ -16,12 +16,10 @@ import 'modal_show_qr_code.dart';
 
 class ChannelDetailScreen extends StatefulWidget {
   final ChannelObj channel;
-  final NFCNetwork network;
 
   ChannelDetailScreen({
     super.key,
     required this.channel,
-    required this.network,
   });
 
   @override
@@ -223,7 +221,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                                 prevA: widget.channel.history.last.myBal,
                                 prevB: widget.channel.history.last.otherBal,
                                 channel: widget.channel,
-                                network: widget.network),
+                            ),
                           ),
                           //update()
                       }
@@ -292,7 +290,6 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                         backgroundColor: Colors.transparent,
                         builder: (context) => ModalClose(
                           channel: widget.channel,
-                          network: widget.network,
                         ),
                       ),
                     ),

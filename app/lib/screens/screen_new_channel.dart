@@ -21,11 +21,9 @@ import 'dart:ui' as ui;
 import '../services/formatting.dart';
 
 class NewChannel extends StatefulWidget {
-  final NFCNetwork nfcNetwork;
 
   const NewChannel({
     super.key,
-    required this.nfcNetwork,
   });
 
   @override
@@ -81,7 +79,6 @@ class _NewChannelState extends State<NewChannel> {
                   context: context,
                   backgroundColor: Colors.transparent,
                   builder: (context) => ModalChannelOpen(
-                    network: widget.nfcNetwork,
                   ),
                 ),
                 update()
@@ -181,14 +178,14 @@ class _NewChannelState extends State<NewChannel> {
           shrinkWrap: true,
           itemCount: MyWallet().channels.length,
           itemBuilder: (context, i) {
-            return _createChannel(channels[i], widget.nfcNetwork);
+            return _createChannel(channels[i]);
           },
         ),
       ),
     ]));
   }
 
-  Widget _createChannel(ChannelObj channel, NFCNetwork network) {
+  Widget _createChannel(ChannelObj channel) {
     EthMetaData data = channel.currentState();
     if (channel.isActive()) {
       return Channel(
@@ -209,7 +206,6 @@ class _NewChannelState extends State<NewChannel> {
               backgroundColor: Colors.transparent,
               builder: (context) => ModalClose(
                 channel: channel,
-                network: network,
               ),
             ),
           ),
@@ -235,7 +231,6 @@ class _NewChannelState extends State<NewChannel> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => ChannelDetailScreen(
                     channel: channel,
-                    network: network,
                   )));
         },
         state: 'You: ${formatValue(data.myBal)} | They: ${formatValue(data.otherBal)}',

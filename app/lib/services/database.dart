@@ -22,11 +22,11 @@ class ChannelDB {
   }
 
   ChannelDB._internal() {
-    dbSetup();
     initDB();
   }
 
-  void initDB() async {
+  Future<void> initDB() async {
+    dbSetup();
     WidgetsFlutterBinding.ensureInitialized();
     String fullPath;
     const path = "channel.db";

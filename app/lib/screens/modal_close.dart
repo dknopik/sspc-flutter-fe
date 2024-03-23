@@ -10,9 +10,8 @@ import 'modal_show_qr_code.dart';
 
 class ModalClose extends StatelessWidget {
   final ChannelObj channel;
-  final NFCNetwork network;
 
-  ModalClose({required this.channel, required this.network});
+  ModalClose({required this.channel});
 
   @override
   Widget build(BuildContext context) {

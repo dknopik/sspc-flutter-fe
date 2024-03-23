@@ -16,11 +16,8 @@ import 'modal_pending_tx.dart';
 import 'modal_show_qr_code.dart';
 
 class ModalChannelOpen extends StatefulWidget {
-  final NFCNetwork network;
-
   const ModalChannelOpen({
     super.key,
-    required this.network
   });
 
   @override
